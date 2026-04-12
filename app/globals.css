@@ -796,9 +796,14 @@ select:focus {
   box-shadow: 0 2px 8px rgb(0 0 0 / 4%);
 }
 
-.history-filters select:hover,
-.history-filters select:focus {
+.history-filters select:hover:not(:disabled),
+.history-filters select:focus:not(:disabled) {
   border-color: var(--green);
+}
+
+.history-filters select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .history-summary {

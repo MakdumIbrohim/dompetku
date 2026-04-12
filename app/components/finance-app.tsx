@@ -851,18 +851,40 @@ function HistoryScreen({
           <option value="all">Semua Tahun</option>
           {availableYears.map((y) => <option key={y} value={y}>{y}</option>)}
         </select>
-        {filterYear !== "all" && (
-          <select value={filterMonth} onChange={handleMonthChange} aria-label="Filter Bulan">
-            <option value="all">Semua Bulan</option>
-            {availableMonths.map((m) => <option key={m} value={m}>{getMonthName(m)}</option>)}
-          </select>
-        )}
-        {filterYear !== "all" && filterMonth !== "all" && (
-          <select value={filterDate} onChange={handleDateChange} aria-label="Filter Tanggal">
-            <option value="all">Semua Tanggal</option>
-            {availableDates.map((d) => <option key={d} value={d}>{d}</option>)}
-          </select>
-        )}
+        
+        <select 
+          value={filterYear === "all" ? "disabled" : filterMonth} 
+          onChange={handleMonthChange} 
+          aria-label="Filter Bulan"
+          disabled={filterYear === "all"}
+        >
+          {filterYear === "all" ? (
+            <option value="disabled" disabled>Pilih Tahun Dulu</option>
+          ) : (
+            <>
+              <option value="all">Semua Bulan</option>
+              {availableMonths.map((m) => <option key={m} value={m}>{getMonthName(m)}</option>)}
+            </>
+          )}
+        </select>
+
+        <select 
+          value={filterYear === "all" || filterMonth === "all" ? "disabled" : filterDate} 
+          onChange={handleDateChange} 
+          aria-label="Filter Tanggal"
+          disabled={filterYear === "all" || filterMonth === "all"}
+        >
+          {filterYear === "all" ? (
+            <option value="disabled" disabled>Pilih Tahun Dulu</option>
+          ) : filterMonth === "all" ? (
+            <option value="disabled" disabled>Pilih Bulan Dulu</option>
+          ) : (
+            <>
+              <option value="all">Semua Tanggal</option>
+              {availableDates.map((d) => <option key={d} value={d}>{d}</option>)}
+            </>
+          )}
+        </select>
       </div>
 
       <section className="history-summary">
