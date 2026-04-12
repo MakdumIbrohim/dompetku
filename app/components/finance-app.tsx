@@ -60,6 +60,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   
   const router = useRouter();
 
+  const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
+    setToast({ message, type });
+  }, []);
+
   useEffect(() => {
     const userStr = localStorage.getItem("dompetku_user");
     if (!userStr && screen !== "login") {
@@ -69,12 +73,15 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
       setUser(userData);
       // Pre-fill nama user ke form 'atas_nama'
       setForm((prev) => ({ ...prev, atas_nama: userData.nama_lengkap }));
-    }
-  }, [screen, router]);
 
-  const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
-    setToast({ message, type });
-  }, []);
+      // Cek apakah baru saja login untuk menampilkan toast di dashboard
+      const showToastFlag = localStorage.getItem("dompetku_show_login_toast");
+      if (showToastFlag === "true" && screen === "dashboard") {
+        showToast(`Selamat datang kembali, ${userData.nama_lengkap}!`, "success");
+        localStorage.removeItem("dompetku_show_login_toast");
+      }
+    }
+  }, [screen, router, showToast]);
 
   useEffect(() => {
     if (screen === "login") return;
@@ -489,8 +496,9 @@ function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" |
 
       if (res.ok && data.user) {
         localStorage.setItem("dompetku_user", JSON.stringify(data.user));
-        showToast(`Selamat datang, ${data.user.nama_lengkap}! Mengalihkan...`, "success");
-        setTimeout(() => router.push("/"), 1200);
+        // Set flag untuk tampilkan toast di dashboard
+        localStorage.setItem("dompetku_show_login_toast", "true");
+        router.push("/");
       } else {
         showToast(data.error || "Gagal login", "error");
       }
