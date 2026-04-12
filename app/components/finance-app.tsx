@@ -41,6 +41,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<{ nama_lengkap: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [editData, setEditData] = useState<Transaction | null>(null);
@@ -57,6 +58,17 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     metode_pembayaran: "Tunai",
     amount: "",
   });
+  
+  const router = useRouter();
+
+  useEffect(() => {
+    const userStr = localStorage.getItem("dompetku_user");
+    if (!userStr && screen !== "login") {
+      router.push("/login");
+    } else if (userStr) {
+      setUser(JSON.parse(userStr));
+    }
+  }, [screen, router]);
 
   const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
     setToast({ message, type });
@@ -327,7 +339,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             <p>Management Keuangan</p>
             <h1>
               {screen === "dashboard" 
-                ? "Dashboard Dompetku" 
+                ? `Halo, ${user?.nama_lengkap || "Pengguna"}!` 
                 : screen === "histori" 
                 ? "Histori Transaksi" 
                 : "Kelola Data"}
@@ -432,15 +444,39 @@ function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" |
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    // Logout otomatis (hapus sesi dari localStorage)
+    localStorage.removeItem("dompetku_user");
+  }, []);
+
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      showToast("Berhasil masuk! Mengalihkan ke Dashboard...", "success");
-      setTimeout(() => {
-        router.push("/");
-      }, 1200);
-    }, 800);
+
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get("username");
+    const password = formData.get("password");
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.user) {
+        localStorage.setItem("dompetku_user", JSON.stringify(data.user));
+        showToast(`Selamat datang, ${data.user.nama_lengkap}! Mengalihkan...`, "success");
+        setTimeout(() => router.push("/"), 1200);
+      } else {
+        showToast(data.error || "Gagal login", "error");
+      }
+    } catch (err) {
+      showToast("Terjadi kesalahan koneksi ke server", "error");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -464,12 +500,12 @@ function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" |
         </div>
         <form className="login-form" onSubmit={handleLogin}>
           <label>
-            Email
-            <input placeholder="nama@email.com" type="email" required />
+            Username
+            <input name="username" placeholder="Masukkan username" type="text" required />
           </label>
           <label>
             Password
-            <input placeholder="password" type="password" required />
+            <input name="password" placeholder="password" type="password" required />
           </label>
           <button className="primary-action" type="submit" disabled={isLoading}>
             {isLoading ? "Memproses..." : "Masuk"}
