@@ -3,31 +3,31 @@
 /* ─── Design Tokens ────────────────────────────────── */
 :root {
   /* Soft warm background */
-  --bg:            #faf8f5;
-  --bg-card:       rgb(255 255 255 / 78%);
-  --fg:            #3f3a36;
+  --bg:            #f5f2ee;
+  --bg-card:       rgb(255 255 255 / 85%);
+  --fg:            #2d2a27;
 
   /* Sage green (income) */
-  --green:         #76b693;
-  --green-light:   #edf8f2;
-  --green-shadow:  rgb(118 182 147 / 16%);
+  --green:         #059D00;
+  --green-light:   #e6f9e6;
+  --green-shadow:  rgb(5 157 0 / 16%);
 
   /* Blush rose (expense) */
-  --rose:          #e19791;
-  --rose-light:    #fff0ef;
-  --rose-shadow:   rgb(225 151 145 / 14%);
+  --rose:          #D60042;
+  --rose-light:    #ffeef2;
+  --rose-shadow:   rgb(214 0 66 / 14%);
 
   /* Balance card — deep slate (still soft) */
-  --slate-deep:    #6f7b8a;
-  --slate-mid:     #8a95a3;
+  --slate-deep:    #5a6572;
+  --slate-mid:     #7a8493;
 
   /* Decorative shapes */
-  --shape-a:       #eee8df;
-  --shape-b:       #f3eee8;
+  --shape-a:       #e8e4dd;
+  --shape-b:       #f0ece6;
 
   /* Muted text */
-  --muted:         #9a9188;
-  --muted-dark:    #c7c0b9;
+  --muted:         #7a756e;
+  --muted-dark:    #b5b0a9;
 
   /* Borders */
   --border:        rgb(63 58 54 / 7%);
