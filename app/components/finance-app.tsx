@@ -369,7 +369,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             <button
               className="logout-button"
               type="button"
-              onClick={() => router.push("/login")}
+              onClick={() => {
+                localStorage.setItem("dompetku_show_logout_toast", "true");
+                router.push("/login");
+              }}
             >
               <LogOutIcon />
               Logout
@@ -476,7 +479,14 @@ function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" |
   useEffect(() => {
     // Logout otomatis (hapus sesi dari localStorage)
     localStorage.removeItem("dompetku_user");
-  }, []);
+
+    // Cek apakah baru saja logout untuk menampilkan toast
+    const showLogoutToast = localStorage.getItem("dompetku_show_logout_toast");
+    if (showLogoutToast === "true") {
+      showToast("Berhasil keluar dari akun.", "success");
+      localStorage.removeItem("dompetku_show_logout_toast");
+    }
+  }, [showToast]);
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
