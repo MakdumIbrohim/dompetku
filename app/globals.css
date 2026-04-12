@@ -253,6 +253,41 @@ a, button { -webkit-tap-highlight-color: transparent; }
   font-weight: 800;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 16px;
+  border: 1.5px solid var(--rose);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--rose);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.logout-button:hover {
+  background: var(--rose-light);
+}
+
+.is-dark .logout-button:hover {
+  background: rgb(214 0 66 / 15%);
+}
+
+.logout-button svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* ─── Theme toggle & primary action buttons ─────────── */
 .theme-button,
 .primary-action,
@@ -1198,11 +1233,12 @@ select:focus {
   .workspace { margin-left: 0; padding: 74px 12px 18px; }
 
   .workspace-header,
-  .section-title { align-items: stretch; flex-direction: column; }
+  .section-title { align-items: flex-start; flex-direction: column; gap: 12px; }
 
-  .workspace-header { padding-right: 54px; }
+  .workspace-header { padding-right: 0; }
 
-  .theme-button { position: absolute; top: 0; right: 0; width: 42px; height: 42px; }
+  .theme-button, .logout-button { height: 42px; }
+  .theme-button { width: 42px; }
   .workspace-header h1 { font-size: 28px; }
 
   .form-grid,

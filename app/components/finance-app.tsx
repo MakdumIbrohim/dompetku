@@ -29,8 +29,7 @@ const rupiah = new Intl.NumberFormat("id-ID", {
 const menuItems = [
   { href: "/", label: "Dashboard" },
   { href: "/histori", label: "Histori" },
-  { href: "/kelola", label: "Kelola Data" },
-  { href: "/login", label: "Logout" },
+  { href: "/kelola", label: "Kelola Data" }
 ];
 
 const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || "";
@@ -345,17 +344,27 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
                 : "Kelola Data"}
             </h1>
           </div>
-          <button
-            className="theme-button"
-            type="button"
-            aria-label={
-              theme === "light" ? "Aktifkan dark mode" : "Aktifkan light mode"
-            }
-            title={theme === "light" ? "Dark mode" : "Light mode"}
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          >
-            {theme === "light" ? <MoonIcon /> : <SunIcon />}
-          </button>
+          <div className="header-actions">
+            <button
+              className="theme-button"
+              type="button"
+              aria-label={
+                theme === "light" ? "Aktifkan dark mode" : "Aktifkan light mode"
+              }
+              title={theme === "light" ? "Dark mode" : "Light mode"}
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            >
+              {theme === "light" ? <MoonIcon /> : <SunIcon />}
+            </button>
+            <button
+              className="logout-button"
+              type="button"
+              onClick={() => router.push("/login")}
+            >
+              <LogOutIcon />
+              Logout
+            </button>
+          </div>
         </header>
 
         {screen === "dashboard" && (
@@ -404,6 +413,16 @@ function SunIcon() {
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="var(--slate-deep)">
       <path d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Z" />
       <path d="M12 2.2v2.4M12 19.4v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" />
+    </svg>
+  );
+}
+
+function LogOutIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
   );
 }
