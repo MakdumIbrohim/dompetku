@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 type Screen = "login" | "dashboard" | "histori";
 type TransactionType = "income" | "expense";
@@ -87,6 +88,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [form, setForm] = useState({
     date: "2026-04-12",
     title: "",
@@ -95,6 +97,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     metode_pembayaran: "Tunai",
     amount: "",
   });
+
+  const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
+    setToast({ message, type });
+  }, []);
 
   useEffect(() => {
     if (screen === "login") return;
@@ -119,7 +125,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
           setTransactions(mappedData);
         }
       })
-      .catch((err) => console.error("Gagal memuat data dari Spreadsheet:", err))
+      .catch((err) => {
+        console.error("Gagal memuat data dari Spreadsheet:", err);
+        showToast("Gagal memuat data histori dari server.", "error");
+      })
       .finally(() => setIsLoading(false));
   }, [screen]);
 
@@ -188,9 +197,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         metode_pembayaran: "Tunai",
         amount: "",
       });
+      showToast("Transaksi berhasil disimpan!", "success");
     } catch (err) {
       console.error("Gagal menyimpan:", err);
-      alert("Gagal menyimpan transaksi!");
+      showToast("Gagal menyimpan transaksi!", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -198,7 +208,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
 
   async function deleteTransaction(id: string) {
     if (id.startsWith("temp-")) {
-      alert("Transaksi ini sedang diproses ke server, coba sebentar lagi.");
+      showToast("Transaksi sedang diproses ke server, coba sebentar lagi.", "error");
       return;
     }
     if (!confirm("Apakah Anda yakin ingin menghapus transaksi ini?")) return;
@@ -212,10 +222,11 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         headers: { "Content-Type": "text/plain" },
         body: JSON.stringify({ action: "DELETE", id_transaksi: id }),
       });
+      showToast("Transaksi berhasil dihapus!", "success");
     } catch (err) {
       console.error("Gagal menghapus:", err);
       setTransactions(prev);
-      alert("Gagal menghapus transaksi!");
+      showToast("Gagal menghapus transaksi!", "error");
     }
   }
 
@@ -228,7 +239,12 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   }
 
   if (screen === "login") {
-    return <LoginScreen />;
+    return (
+      <>
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+        <LoginScreen showToast={showToast} />
+      </>
+    );
   }
 
   return (
@@ -237,6 +253,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         sidebarOpen ? "sidebar-open" : ""
       }`}
     >
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <button
         className="menu-button"
         type="button"
@@ -352,7 +369,21 @@ function Sidebar({
   );
 }
 
-function LoginScreen() {
+function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" | "error") => void }) {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(() => {
+      showToast("Berhasil masuk! Mengalihkan ke Dashboard...", "success");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1200);
+    }, 800);
+  }
+
   return (
     <main className="login-page">
       <span className="shape shape-cyan" />
@@ -372,18 +403,18 @@ function LoginScreen() {
           <h1>Dompetku</h1>
           <span>Masuk untuk mengatur pemasukan, pengeluaran, dan histori keuangan harian.</span>
         </div>
-        <form className="login-form">
+        <form className="login-form" onSubmit={handleLogin}>
           <label>
             Email
-            <input placeholder="nama@email.com" type="email" />
+            <input placeholder="nama@email.com" type="email" required />
           </label>
           <label>
             Password
-            <input placeholder="password" type="password" />
+            <input placeholder="password" type="password" required />
           </label>
-          <Link className="primary-action" href="/dashboard">
-            Masuk
-          </Link>
+          <button className="primary-action" type="submit" disabled={isLoading}>
+            {isLoading ? "Memproses..." : "Masuk"}
+          </button>
         </form>
       </section>
     </main>
@@ -772,6 +803,22 @@ function DonutChart() {
   return (
     <div className="donut-chart" aria-label="Grafik pengeluaran">
       <span />
+    </div>
+  );
+}
+
+function Toast({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 3500);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className="toast-wrapper">
+      <div className={`toast-notification ${type}`}>
+        <span>{message}</span>
+        <button onClick={onClose} type="button" aria-label="Tutup">✕</button>
+      </div>
     </div>
   );
 }
