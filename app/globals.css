@@ -269,17 +269,17 @@ a, button { -webkit-tap-highlight-color: transparent; }
   flex: 0 0 auto;
   place-items: center;
   padding: 0;
-  background: var(--green-light);
-  color: var(--green);
-  box-shadow: 0 4px 14px var(--green-shadow);
+  background: var(--shape-b);
+  color: var(--slate-deep);
+  box-shadow: 0 4px 14px var(--border);
   transition: background 180ms ease;
 }
 
-.theme-button:hover { background: #e2f3eb; }
+.theme-button:hover { background: var(--shape-a); }
 
 .is-dark .theme-button {
-  background: rgb(90 158 124 / 18%);
-  color: #8fd4b0;
+  background: rgb(255 255 255 / 10%);
+  color: var(--muted-dark);
 }
 
 .theme-button svg {

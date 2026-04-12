@@ -58,8 +58,8 @@ const seedTransactions: Transaction[] = [
 ];
 
 const expenseBreakdown = [
-  { label: "Pemasukan", value: 64, color: "#76b693" },
-  { label: "Pengeluaran", value: 36, color: "#e19791" },
+  { label: "Pemasukan", value: 64, color: "#059D00" },
+  { label: "Pengeluaran", value: 36, color: "#D60042" },
 ];
 
 const menuItems = [
@@ -215,7 +215,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
 
 function MoonIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="var(--slate-deep)">
       <path d="M20.6 15.5A8.3 8.3 0 0 1 8.5 3.4a8.8 8.8 0 1 0 12.1 12.1Z" />
     </svg>
   );
@@ -223,7 +223,7 @@ function MoonIcon() {
 
 function SunIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24">
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="var(--slate-deep)">
       <path d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Z" />
       <path d="M12 2.2v2.4M12 19.4v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" />
     </svg>
