@@ -302,13 +302,18 @@ a, button { -webkit-tap-highlight-color: transparent; }
   flex: 0 0 auto;
   place-items: center;
   padding: 0;
-  background: var(--shape-b);
+  background: #fff;
   color: var(--slate-deep);
+  border: 1.5px solid var(--border);
   box-shadow: 0 4px 14px var(--border);
-  transition: background 180ms ease;
+  transition: all 180ms ease;
 }
 
-.theme-button:hover { background: var(--shape-a); }
+.theme-button:hover { 
+  background: var(--shape-b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px var(--border);
+}
 
 .is-dark .theme-button {
   background: rgb(255 255 255 / 10%);
