@@ -457,9 +457,9 @@ function DashboardScreen({
           <label>
             Nominal
             <input
-              value={form.amount}
+              value={form.amount ? Number(form.amount).toLocaleString("id-ID") : ""}
               inputMode="numeric"
-              placeholder="250000"
+              placeholder="250.000"
               onChange={(event) =>
                 onFormChange((current) => ({
                   ...current,
