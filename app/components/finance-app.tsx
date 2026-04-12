@@ -65,7 +65,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     if (!userStr && screen !== "login") {
       router.push("/login");
     } else if (userStr) {
-      setUser(JSON.parse(userStr));
+      const userData = JSON.parse(userStr);
+      setUser(userData);
+      // Pre-fill nama user ke form 'atas_nama'
+      setForm((prev) => ({ ...prev, atas_nama: userData.nama_lengkap }));
     }
   }, [screen, router]);
 
@@ -168,7 +171,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
       setForm({
         date: new Date().toISOString().split("T")[0],
         title: "",
-        atas_nama: "",
+        atas_nama: user?.nama_lengkap || "",
         type: formType,
         metode_pembayaran: "Tunai",
         amount: "",
