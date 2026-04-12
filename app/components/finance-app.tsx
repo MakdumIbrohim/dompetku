@@ -8,7 +8,7 @@ type Screen = "login" | "dashboard" | "histori";
 type TransactionType = "income" | "expense";
 
 type Transaction = {
-  id: number;
+  id: string;
   date: string;
   title: string;
   atas_nama: string;
@@ -26,7 +26,7 @@ const rupiah = new Intl.NumberFormat("id-ID", {
 
 const seedTransactions: Transaction[] = [
   {
-    id: 1,
+    id: "1",
     date: "2026-04-12",
     title: "Gaji bulanan",
     atas_nama: "Brohim",
@@ -36,7 +36,7 @@ const seedTransactions: Transaction[] = [
     created_at: "2026-04-12 08:00:00",
   },
   {
-    id: 2,
+    id: "2",
     date: "2026-04-11",
     title: "Belanja dapur",
     atas_nama: "Brohim",
@@ -46,7 +46,7 @@ const seedTransactions: Transaction[] = [
     created_at: "2026-04-11 10:30:00",
   },
   {
-    id: 3,
+    id: "3",
     date: "2026-04-10",
     title: "Internet rumah",
     atas_nama: "Brohim",
@@ -56,7 +56,7 @@ const seedTransactions: Transaction[] = [
     created_at: "2026-04-10 14:00:00",
   },
   {
-    id: 4,
+    id: "4",
     date: "2026-04-09",
     title: "Proyek desain",
     atas_nama: "Client ABC",
@@ -78,18 +78,15 @@ const menuItems = [
   { href: "/login", label: "Logout" },
 ];
 
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzCuN2l-8QSOah_mCjxI-Cdxl7NgFunJL1D6fL1PRXdQP2JRqSyAjket28fjCP__NXb/exec";
+
 export default function FinanceApp({ screen }: { screen: Screen }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [formType, setFormType] = useState<TransactionType>("income");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    if (typeof window === "undefined") {
-      return seedTransactions;
-    }
-
-    const saved = window.localStorage.getItem("dompetku-transactions");
-    return saved ? (JSON.parse(saved) as Transaction[]) : seedTransactions;
-  });
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     date: "2026-04-12",
     title: "",
@@ -100,11 +97,31 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   });
 
   useEffect(() => {
-    window.localStorage.setItem(
-      "dompetku-transactions",
-      JSON.stringify(transactions),
-    );
-  }, [transactions]);
+    if (screen === "login") return;
+    
+    setIsLoading(true);
+    fetch(GAS_URL)
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === "success") {
+          const mappedData: Transaction[] = res.data.map((item: any) => {
+            return {
+              id: String(item.id_transaksi),
+              date: item.tanggal ? new Date(item.tanggal).toISOString().split("T")[0] : "",
+              title: item.keterangan,
+              atas_nama: item.atas_nama,
+              type: item.jenis as TransactionType,
+              metode_pembayaran: item.metode_pembayaran,
+              amount: Number(item.nominal) || 0,
+              created_at: item.created_at,
+            };
+          }).reverse();
+          setTransactions(mappedData);
+        }
+      })
+      .catch((err) => console.error("Gagal memuat data dari Spreadsheet:", err))
+      .finally(() => setIsLoading(false));
+  }, [screen]);
 
   const totals = useMemo(() => {
     const income = transactions
@@ -121,7 +138,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     };
   }, [transactions]);
 
-  function submitTransaction(event: React.FormEvent<HTMLFormElement>) {
+  async function submitTransaction(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const amount = Number(form.amount);
@@ -129,28 +146,77 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
       return;
     }
 
-    setTransactions((items) => [
-      {
-        id: Date.now(),
-        date: form.date,
-        title: form.title,
-        atas_nama: form.atas_nama,
-        type: form.type,
-        metode_pembayaran: form.metode_pembayaran,
-        amount,
-        created_at: new Date().toISOString().replace("T", " ").slice(0, 19),
-      },
-      ...items,
-    ]);
+    setIsSubmitting(true);
 
-    setForm({
-      date: "2026-04-12",
-      title: "",
-      atas_nama: "",
-      type: form.type,
-      metode_pembayaran: "Tunai",
-      amount: "",
-    });
+    const payload = {
+      action: "CREATE",
+      tanggal: form.date,
+      keterangan: form.title,
+      atas_nama: form.atas_nama,
+      jenis: form.type,
+      metode_pembayaran: form.metode_pembayaran,
+      nominal: amount,
+    };
+
+    try {
+      // Catatan: Google Apps Script memerlukan content-type text/plain agar tidak memicu error CORS preflight.
+      await fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload),
+      });
+
+      setTransactions((items) => [
+        {
+          id: `temp-${Date.now()}`,
+          date: form.date,
+          title: form.title,
+          atas_nama: form.atas_nama,
+          type: form.type,
+          metode_pembayaran: form.metode_pembayaran,
+          amount,
+          created_at: new Date().toISOString().replace("T", " ").slice(0, 19),
+        },
+        ...items,
+      ]);
+
+      setForm({
+        date: new Date().toISOString().split("T")[0],
+        title: "",
+        atas_nama: "",
+        type: formType,
+        metode_pembayaran: "Tunai",
+        amount: "",
+      });
+    } catch (err) {
+      console.error("Gagal menyimpan:", err);
+      alert("Gagal menyimpan transaksi!");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function deleteTransaction(id: string) {
+    if (id.startsWith("temp-")) {
+      alert("Transaksi ini sedang diproses ke server, coba sebentar lagi.");
+      return;
+    }
+    if (!confirm("Apakah Anda yakin ingin menghapus transaksi ini?")) return;
+    
+    const prev = [...transactions];
+    setTransactions((items) => items.filter((i) => i.id !== id));
+
+    try {
+      await fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({ action: "DELETE", id_transaksi: id }),
+      });
+    } catch (err) {
+      console.error("Gagal menghapus:", err);
+      setTransactions(prev);
+      alert("Gagal menghapus transaksi!");
+    }
   }
 
   function changeFormType(nextType: TransactionType) {
@@ -219,10 +285,18 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             onFormChange={setForm}
             onTypeChange={changeFormType}
             onSubmit={submitTransaction}
+            isSubmitting={isSubmitting}
+            isLoading={isLoading}
+            onDelete={deleteTransaction}
           />
         )}
         {screen === "histori" && (
-          <HistoryScreen totals={totals} transactions={transactions} />
+          <HistoryScreen 
+            totals={totals} 
+            transactions={transactions}
+            isLoading={isLoading}
+            onDelete={deleteTransaction}
+          />
         )}
       </section>
     </main>
@@ -324,6 +398,9 @@ function DashboardScreen({
   onFormChange,
   onTypeChange,
   onSubmit,
+  isSubmitting,
+  isLoading,
+  onDelete,
 }: {
   form: { date: string; title: string; atas_nama: string; type: TransactionType; metode_pembayaran: string; amount: string };
   formType: TransactionType;
@@ -341,6 +418,9 @@ function DashboardScreen({
   >;
   onTypeChange: (type: TransactionType) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  isSubmitting?: boolean;
+  isLoading?: boolean;
+  onDelete?: (id: string) => void;
 }) {
   const metodeOptions = ["Tunai", "Transfer", "E-Wallet", "Kartu Kredit"];
 
@@ -490,8 +570,8 @@ function DashboardScreen({
             </div>
           </div>
         )}
-        <button className="primary-action" type="submit">
-          Simpan transaksi
+        <button className="primary-action" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Menyimpan ke Google Sheet..." : "Simpan transaksi"}
         </button>
       </form>
 
@@ -501,9 +581,15 @@ function DashboardScreen({
           <Link href="/histori">Lihat semua</Link>
         </div>
         <div className="recent-list">
-          {transactions.slice(0, 5).map((item) => (
-            <TransactionRow item={item} key={item.id} />
-          ))}
+          {isLoading ? (
+            <p style={{ gridColumn: "1 / -1", textAlign: "center", padding: "20px", color: "var(--muted)" }}>Memuat data...</p>
+          ) : transactions.length === 0 ? (
+            <p style={{ gridColumn: "1 / -1", textAlign: "center", padding: "20px", color: "var(--muted)" }}>Belum ada transaksi.</p>
+          ) : (
+            transactions.slice(0, 5).map((item) => (
+              <TransactionRow item={item} key={item.id} onDelete={onDelete} />
+            ))
+          )}
         </div>
       </section>
     </div>
@@ -513,9 +599,13 @@ function DashboardScreen({
 function HistoryScreen({
   totals,
   transactions,
+  isLoading,
+  onDelete,
 }: {
   totals: { income: number; expense: number; balance: number };
   transactions: Transaction[];
+  isLoading?: boolean;
+  onDelete?: (id: string) => void;
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -563,12 +653,23 @@ function HistoryScreen({
                 <th>Metode</th>
                 <th>Tipe</th>
                 <th>Nominal</th>
+                <th style={{ width: "40px" }}></th>
               </tr>
             </thead>
             <tbody>
-              {currentTransactions.map((item) => (
-                <HistoryRow item={item} key={item.id} />
-              ))}
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Memuat data dari Spreadsheet...</td>
+                </tr>
+              ) : currentTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada histori transaksi.</td>
+                </tr>
+              ) : (
+                currentTransactions.map((item) => (
+                  <HistoryRow item={item} key={item.id} onDelete={onDelete} />
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -603,7 +704,7 @@ function MetricCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-function TransactionRow({ item }: { item: Transaction }) {
+function TransactionRow({ item, onDelete }: { item: Transaction; onDelete?: (id: string) => void }) {
   return (
     <article className={`transaction-row ${item.type}`}>
       <div className="row-icon">{item.type === "income" ? "+" : "-"}</div>
@@ -617,11 +718,21 @@ function TransactionRow({ item }: { item: Transaction }) {
         {item.type === "income" ? "+" : "-"}
         {rupiah.format(item.amount)}
       </b>
+      {onDelete && (
+        <button 
+          type="button" 
+          onClick={() => onDelete(item.id)} 
+          className="delete-button"
+          title="Hapus"
+        >
+          ✕
+        </button>
+      )}
     </article>
   );
 }
 
-function HistoryRow({ item }: { item: Transaction }) {
+function HistoryRow({ item, onDelete }: { item: Transaction; onDelete?: (id: string) => void }) {
   return (
     <tr className={`history-row ${item.type}`}>
       <td style={{ whiteSpace: "nowrap" }}>{formatDate(item.date)}</td>
@@ -640,6 +751,18 @@ function HistoryRow({ item }: { item: Transaction }) {
           {item.type === "income" ? "+" : "-"}
           {rupiah.format(item.amount)}
         </b>
+      </td>
+      <td>
+        {onDelete && (
+          <button 
+            type="button" 
+            onClick={() => onDelete(item.id)} 
+            className="delete-button"
+            title="Hapus transaksi ini"
+          >
+            ✕
+          </button>
+        )}
       </td>
     </tr>
   );
