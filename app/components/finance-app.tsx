@@ -71,6 +71,7 @@ const menuItems = [
 export default function FinanceApp({ screen }: { screen: Screen }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [formType, setFormType] = useState<TransactionType>("income");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     if (typeof window === "undefined") {
       return seedTransactions;
@@ -149,8 +150,28 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   }
 
   return (
-    <main className={`web-shell ${theme === "dark" ? "is-dark" : ""}`}>
-      <Sidebar screen={screen} />
+    <main
+      className={`web-shell ${theme === "dark" ? "is-dark" : ""} ${
+        sidebarOpen ? "sidebar-open" : ""
+      }`}
+    >
+      <button
+        className="menu-button"
+        type="button"
+        aria-label="Buka sidebar"
+        onClick={() => setSidebarOpen(true)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+      <button
+        className="sidebar-backdrop"
+        type="button"
+        aria-label="Tutup sidebar"
+        onClick={() => setSidebarOpen(false)}
+      />
+      <Sidebar screen={screen} onNavigate={() => setSidebarOpen(false)} />
       <section className="workspace">
         <span className="shape shape-cyan" />
         <span className="shape shape-coral" />
@@ -188,10 +209,16 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   );
 }
 
-function Sidebar({ screen }: { screen: Screen }) {
+function Sidebar({
+  screen,
+  onNavigate,
+}: {
+  screen: Screen;
+  onNavigate: () => void;
+}) {
   return (
     <aside className="sidebar">
-      <Link className="brand" href="/dashboard">
+      <Link className="brand" href="/dashboard" onClick={onNavigate}>
         <Image src="/wallet-mark.svg" alt="Dompetku" width={48} height={48} />
         <span>
           <strong>Dompetku</strong>
@@ -204,6 +231,7 @@ function Sidebar({ screen }: { screen: Screen }) {
             className={screenLabel(screen) === item.label ? "active" : ""}
             href={item.href}
             key={item.href}
+            onClick={onNavigate}
           >
             {item.label}
           </Link>
