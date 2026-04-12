@@ -58,8 +58,8 @@ const seedTransactions: Transaction[] = [
 ];
 
 const expenseBreakdown = [
-  { label: "Pemasukan", value: 64, color: "#16a34a" },
-  { label: "Pengeluaran", value: 36, color: "#dc2626" },
+  { label: "Pemasukan", value: 64, color: "#76b693" },
+  { label: "Pengeluaran", value: 36, color: "#e19791" },
 ];
 
 const menuItems = [
