@@ -760,32 +760,129 @@ function HistoryScreen({
   transactions: Transaction[];
   isLoading?: boolean;
 }) {
+  const [filterYear, setFilterYear] = useState<string>("all");
+  const [filterMonth, setFilterMonth] = useState<string>("all");
+  const [filterDate, setFilterDate] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const totalPages = Math.ceil(transactions.length / itemsPerPage);
-  const currentTransactions = transactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const availableYears = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let y = currentYear; y >= 2025; y--) {
+      years.push(y.toString());
+    }
+    return years;
+  }, []);
+
+  const availableMonths = useMemo(() => {
+    if (filterYear === "all") return [];
+    const today = new Date();
+    const isCurrentYear = parseInt(filterYear) === today.getFullYear();
+    const maxMonth = isCurrentYear ? today.getMonth() + 1 : 12;
+    const months = [];
+    for (let m = 1; m <= maxMonth; m++) {
+      months.push(m.toString().padStart(2, "0"));
+    }
+    return months;
+  }, [filterYear]);
+
+  const availableDates = useMemo(() => {
+    if (filterYear === "all" || filterMonth === "all") return [];
+    const today = new Date();
+    const y = parseInt(filterYear);
+    const m = parseInt(filterMonth);
+    const isCurrentMonth = y === today.getFullYear() && m === today.getMonth() + 1;
+    const maxDate = isCurrentMonth ? today.getDate() : new Date(y, m, 0).getDate();
+    
+    const dates = [];
+    for (let d = 1; d <= maxDate; d++) {
+      dates.push(d.toString().padStart(2, "0"));
+    }
+    return dates;
+  }, [filterYear, filterMonth]);
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((t) => {
+      if (!t.date) return filterYear === "all";
+      if (filterYear !== "all" && !t.date.startsWith(filterYear)) return false;
+      if (filterMonth !== "all" && !t.date.startsWith(`${filterYear}-${filterMonth}`)) return false;
+      if (filterDate !== "all" && t.date !== `${filterYear}-${filterMonth}-${filterDate}`) return false;
+      return true;
+    });
+  }, [transactions, filterYear, filterMonth, filterDate]);
+
+  const filteredTotals = useMemo(() => {
+    const income = filteredTransactions
+      .filter((item) => item.type === "Pemasukan")
+      .reduce((sum, item) => sum + item.amount, 0);
+    const expense = filteredTransactions
+      .filter((item) => item.type === "Pengeluaran")
+      .reduce((sum, item) => sum + item.amount, 0);
+
+    return { income, expense, balance: income - expense };
+  }, [filteredTransactions]);
+
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const currentTransactions = filteredTransactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  function handleYearChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setFilterYear(e.target.value);
+    setFilterMonth("all");
+    setFilterDate("all");
+    setCurrentPage(1);
+  }
+
+  function handleMonthChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setFilterMonth(e.target.value);
+    setFilterDate("all");
+    setCurrentPage(1);
+  }
+
+  function handleDateChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    setFilterDate(e.target.value);
+    setCurrentPage(1);
+  }
 
   return (
     <div className="history-layout">
+      <div className="history-filters">
+        <select value={filterYear} onChange={handleYearChange} aria-label="Filter Tahun">
+          <option value="all">Semua Tahun</option>
+          {availableYears.map((y) => <option key={y} value={y}>{y}</option>)}
+        </select>
+        {filterYear !== "all" && (
+          <select value={filterMonth} onChange={handleMonthChange} aria-label="Filter Bulan">
+            <option value="all">Semua Bulan</option>
+            {availableMonths.map((m) => <option key={m} value={m}>{getMonthName(m)}</option>)}
+          </select>
+        )}
+        {filterYear !== "all" && filterMonth !== "all" && (
+          <select value={filterDate} onChange={handleDateChange} aria-label="Filter Tanggal">
+            <option value="all">Semua Tanggal</option>
+            {availableDates.map((d) => <option key={d} value={d}>{d}</option>)}
+          </select>
+        )}
+      </div>
+
       <section className="history-summary">
         <div>
-          <p>Monthly expense</p>
-          <strong>{rupiah.format(totals.expense)}</strong>
+          <p>Total Pengeluaran</p>
+          <strong>{rupiah.format(filteredTotals.expense)}</strong>
         </div>
-        <DonutChart income={totals.income} expense={totals.expense} />
+        <DonutChart income={filteredTotals.income} expense={filteredTotals.expense} />
       </section>
 
       <section className="history-metrics">
-        <MetricCard label="Total budget" value={rupiah.format(totals.income)} />
-        <MetricCard label="Expense" value={rupiah.format(totals.expense)} />
-        <MetricCard label="Saldo" value={rupiah.format(totals.balance)} />
+        <MetricCard label="Total Pemasukan" value={rupiah.format(filteredTotals.income)} />
+        <MetricCard label="Total Pengeluaran" value={rupiah.format(filteredTotals.expense)} />
+        <MetricCard label="Sisa Saldo" value={rupiah.format(filteredTotals.balance)} />
       </section>
 
       <section className="history-table">
         <div className="section-title">
           <p>Histori transaksi</p>
-          <span>{transactions.length} data</span>
+          <span>{filteredTransactions.length} data</span>
         </div>
         <div style={{ overflowX: "auto" }}>
           <table>
@@ -1128,6 +1225,11 @@ function formatDate(value: string) {
     month: "short",
     year: "numeric",
   }).format(new Date(value));
+}
+
+function getMonthName(monthStr: string) {
+  const date = new Date(2000, parseInt(monthStr, 10) - 1, 1);
+  return new Intl.DateTimeFormat("id-ID", { month: "long" }).format(date);
 }
 
 function screenLabel(screen: Screen) {
