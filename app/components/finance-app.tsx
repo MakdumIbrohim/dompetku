@@ -9,11 +9,13 @@ type TransactionType = "income" | "expense";
 
 type Transaction = {
   id: number;
-  type: TransactionType;
-  title: string;
-  amount: number;
-  category: string;
   date: string;
+  title: string;
+  atas_nama: string;
+  type: TransactionType;
+  metode_pembayaran: string;
+  amount: number;
+  created_at: string;
 };
 
 const rupiah = new Intl.NumberFormat("id-ID", {
@@ -25,35 +27,43 @@ const rupiah = new Intl.NumberFormat("id-ID", {
 const seedTransactions: Transaction[] = [
   {
     id: 1,
-    type: "income",
-    title: "Gaji bulanan",
-    amount: 8500000,
-    category: "Salary",
     date: "2026-04-12",
+    title: "Gaji bulanan",
+    atas_nama: "Brohim",
+    type: "income",
+    metode_pembayaran: "Transfer",
+    amount: 8500000,
+    created_at: "2026-04-12 08:00:00",
   },
   {
     id: 2,
-    type: "expense",
-    title: "Belanja dapur",
-    amount: 425000,
-    category: "Food",
     date: "2026-04-11",
+    title: "Belanja dapur",
+    atas_nama: "Brohim",
+    type: "expense",
+    metode_pembayaran: "Tunai",
+    amount: 425000,
+    created_at: "2026-04-11 10:30:00",
   },
   {
     id: 3,
-    type: "expense",
-    title: "Internet rumah",
-    amount: 315000,
-    category: "Bills",
     date: "2026-04-10",
+    title: "Internet rumah",
+    atas_nama: "Brohim",
+    type: "expense",
+    metode_pembayaran: "Transfer",
+    amount: 315000,
+    created_at: "2026-04-10 14:00:00",
   },
   {
     id: 4,
-    type: "income",
-    title: "Proyek desain",
-    amount: 1400000,
-    category: "Freelance",
     date: "2026-04-09",
+    title: "Proyek desain",
+    atas_nama: "Client ABC",
+    type: "income",
+    metode_pembayaran: "Transfer",
+    amount: 1400000,
+    created_at: "2026-04-09 16:45:00",
   },
 ];
 
@@ -81,10 +91,12 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     return saved ? (JSON.parse(saved) as Transaction[]) : seedTransactions;
   });
   const [form, setForm] = useState({
-    title: "",
-    amount: "",
-    category: "Salary",
     date: "2026-04-12",
+    title: "",
+    atas_nama: "",
+    type: "income" as TransactionType,
+    metode_pembayaran: "Tunai",
+    amount: "",
   });
 
   useEffect(() => {
@@ -120,20 +132,24 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     setTransactions((items) => [
       {
         id: Date.now(),
-        type: formType,
-        title: form.title,
-        amount,
-        category: form.category,
         date: form.date,
+        title: form.title,
+        atas_nama: form.atas_nama,
+        type: form.type,
+        metode_pembayaran: form.metode_pembayaran,
+        amount,
+        created_at: new Date().toISOString().replace("T", " ").slice(0, 19),
       },
       ...items,
     ]);
 
     setForm({
-      title: "",
-      amount: "",
-      category: formType === "income" ? "Salary" : "Food",
       date: "2026-04-12",
+      title: "",
+      atas_nama: "",
+      type: form.type,
+      metode_pembayaran: "Tunai",
+      amount: "",
     });
   }
 
@@ -141,7 +157,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     setFormType(nextType);
     setForm((current) => ({
       ...current,
-      category: nextType === "income" ? "Salary" : "Food",
+      type: nextType,
     }));
   }
 
@@ -309,25 +325,24 @@ function DashboardScreen({
   onTypeChange,
   onSubmit,
 }: {
-  form: { title: string; amount: string; category: string; date: string };
+  form: { date: string; title: string; atas_nama: string; type: TransactionType; metode_pembayaran: string; amount: string };
   formType: TransactionType;
   totals: { income: number; expense: number; balance: number };
   transactions: Transaction[];
   onFormChange: React.Dispatch<
     React.SetStateAction<{
-      title: string;
-      amount: string;
-      category: string;
       date: string;
+      title: string;
+      atas_nama: string;
+      type: TransactionType;
+      metode_pembayaran: string;
+      amount: string;
     }>
   >;
   onTypeChange: (type: TransactionType) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 }) {
-  const categories =
-    formType === "income"
-      ? ["Salary", "Freelance", "Bonus", "Investasi"]
-      : ["Food", "Bills", "Transport", "Fun"];
+  const metodeOptions = ["Tunai", "Transfer", "E-Wallet", "Kartu Kredit"];
 
   return (
     <div className="dashboard-grid">
@@ -374,12 +389,25 @@ function DashboardScreen({
             Pengeluaran
           </button>
         </div>
-        <div className="form-grid wide">
+        <div className="form-grid">
+          <label>
+            Tanggal
+            <input
+              value={form.date}
+              type="date"
+              onChange={(event) =>
+                onFormChange((current) => ({
+                  ...current,
+                  date: event.target.value,
+                }))
+              }
+            />
+          </label>
           <label>
             Keterangan
             <input
               value={form.title}
-              placeholder={formType === "income" ? "Contoh: bonus" : "Contoh: makan"}
+              placeholder={formType === "income" ? "Pemasukan untuk..." : "Pengeluaran untuk..."}
               onChange={(event) =>
                 onFormChange((current) => ({
                   ...current,
@@ -388,6 +416,39 @@ function DashboardScreen({
               }
             />
           </label>
+        </div>
+        <div className="form-grid">
+          <label>
+            Atas Nama
+            <input
+              value={form.atas_nama}
+              placeholder="Nama pihak terkait"
+              onChange={(event) =>
+                onFormChange((current) => ({
+                  ...current,
+                  atas_nama: event.target.value,
+                }))
+              }
+            />
+          </label>
+          <label>
+            Metode Pembayaran
+            <select
+              value={form.metode_pembayaran}
+              onChange={(event) =>
+                onFormChange((current) => ({
+                  ...current,
+                  metode_pembayaran: event.target.value,
+                }))
+              }
+            >
+              {metodeOptions.map((method) => (
+                <option key={method}>{method}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <div className="form-grid wide">
           <label>
             Nominal
             <input
@@ -398,37 +459,6 @@ function DashboardScreen({
                 onFormChange((current) => ({
                   ...current,
                   amount: event.target.value.replace(/\D/g, ""),
-                }))
-              }
-            />
-          </label>
-        </div>
-        <div className="form-grid">
-          <label>
-            Kategori
-            <select
-              value={form.category}
-              onChange={(event) =>
-                onFormChange((current) => ({
-                  ...current,
-                  category: event.target.value,
-                }))
-              }
-            >
-              {categories.map((category) => (
-                <option key={category}>{category}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Tanggal
-            <input
-              value={form.date}
-              type="date"
-              onChange={(event) =>
-                onFormChange((current) => ({
-                  ...current,
-                  date: event.target.value,
                 }))
               }
             />
@@ -493,7 +523,8 @@ function HistoryScreen({
         </div>
         <div className="table-head">
           <span>Keterangan</span>
-          <span>Kategori</span>
+          <span>Atas Nama</span>
+          <span>Metode</span>
           <span>Tanggal</span>
           <span>Nominal</span>
         </div>
@@ -521,7 +552,7 @@ function TransactionRow({ item }: { item: Transaction }) {
       <div>
         <strong>{item.title}</strong>
         <span>
-          {item.category} - {formatDate(item.date)}
+          {item.atas_nama} - {item.metode_pembayaran} - {formatDate(item.date)}
         </span>
       </div>
       <b>
@@ -536,7 +567,8 @@ function HistoryRow({ item }: { item: Transaction }) {
   return (
     <article className={`history-row ${item.type}`}>
       <strong>{item.title}</strong>
-      <span>{item.category}</span>
+      <span>{item.atas_nama}</span>
+      <span>{item.metode_pembayaran}</span>
       <span>{formatDate(item.date)}</span>
       <b>
         {item.type === "income" ? "+" : "-"}
