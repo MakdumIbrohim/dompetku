@@ -411,8 +411,8 @@ a, button { -webkit-tap-highlight-color: transparent; }
 /* ─── Donut / chart card ────────────────────────────── */
 .chart-card {
   display: grid;
-  grid-template-columns: 1fr 120px 160px;
-  gap: 20px;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
   align-items: center;
   padding: 24px;
 }
