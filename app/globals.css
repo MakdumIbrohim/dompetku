@@ -545,8 +545,8 @@ select:focus {
   box-shadow: 0 0 0 3px var(--green-shadow);
 }
 
-.transaction-form.expense input:focus,
-.transaction-form.expense select:focus {
+.transaction-form.Pengeluaran input:focus,
+.transaction-form.Pengeluaran select:focus {
   border-color: var(--rose);
   box-shadow: 0 0 0 3px var(--rose-shadow);
 }
@@ -571,12 +571,12 @@ select:focus {
   box-shadow: 0 8px 22px var(--green-shadow);
 }
 
-.transaction-form.expense .primary-action {
+.transaction-form.Pengeluaran .primary-action {
   background: var(--rose);
   box-shadow: 0 6px 18px var(--rose-shadow);
 }
 
-.transaction-form.expense .primary-action:hover {
+.transaction-form.Pengeluaran .primary-action:hover {
   filter: brightness(1.06);
   box-shadow: 0 8px 22px var(--rose-shadow);
 }
@@ -643,11 +643,11 @@ select:focus {
   font-weight: 800;
 }
 
-.balance-change strong.income {
+.balance-change strong.Pemasukan {
   color: var(--green);
 }
 
-.balance-change strong.expense {
+.balance-change strong.Pengeluaran {
   color: var(--rose);
 }
 
@@ -728,7 +728,7 @@ select:focus {
   font-size: 18px;
 }
 
-.transaction-row.income .row-icon {
+.transaction-row.Pemasukan .row-icon {
   background: var(--green-light);
   color: var(--green);
 }
@@ -754,8 +754,8 @@ select:focus {
   white-space: nowrap;
 }
 
-.transaction-row.income b,
-.history-row.income b { color: var(--green); }
+.transaction-row.Pemasukan b,
+.history-row.Pemasukan b { color: var(--green); }
 
 
 /* ─── History page ──────────────────────────────────── */
