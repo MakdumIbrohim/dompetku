@@ -199,7 +199,7 @@ button {
   position: relative;
   z-index: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 28px;
@@ -233,17 +233,38 @@ button {
 }
 
 .theme-button {
-  min-width: 116px;
-  padding: 13px 16px;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
   background: #111827;
   color: #ffffff;
-  font-size: 13px;
-  font-weight: 900;
+  box-shadow: 0 10px 22px rgb(17 24 39 / 16%);
 }
 
 .is-dark .theme-button {
   background: #f9fafb;
   color: #111827;
+}
+
+.theme-button svg {
+  width: 21px;
+  height: 21px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-button svg path:first-child {
+  stroke: none;
+}
+
+.theme-button svg path + path {
+  fill: none;
 }
 
 .dashboard-grid {
@@ -843,6 +864,18 @@ select:focus {
   .section-title {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .workspace-header {
+    padding-right: 54px;
+  }
+
+  .theme-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 42px;
+    height: 42px;
   }
 
   .workspace-header h1 {

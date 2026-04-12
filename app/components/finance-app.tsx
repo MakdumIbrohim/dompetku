@@ -184,9 +184,13 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
           <button
             className="theme-button"
             type="button"
+            aria-label={
+              theme === "light" ? "Aktifkan dark mode" : "Aktifkan light mode"
+            }
+            title={theme === "light" ? "Dark mode" : "Light mode"}
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
           >
-            {theme === "light" ? "Dark Mode" : "Light Mode"}
+            {theme === "light" ? <MoonIcon /> : <SunIcon />}
           </button>
         </header>
 
@@ -206,6 +210,23 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         )}
       </section>
     </main>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M20.6 15.5A8.3 8.3 0 0 1 8.5 3.4a8.8 8.8 0 1 0 12.1 12.1Z" />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6Z" />
+      <path d="M12 2.2v2.4M12 19.4v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" />
+    </svg>
   );
 }
 
