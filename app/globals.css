@@ -1165,7 +1165,8 @@ select:focus {
 }
 
 /* ─── Print Styles (Export PDF) ─────────────────────── */
-.print-only {
+.print-only,
+.report-header-print {
   display: none;
 }
 
@@ -1183,6 +1184,7 @@ select:focus {
   .pagination,
   .menu-button,
   .modal-backdrop,
+  .shape,
   .no-print {
     display: none !important;
   }

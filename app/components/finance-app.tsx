@@ -531,8 +531,8 @@ function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" |
 
   return (
     <main className="login-page">
-      <span className="shape shape-cyan" />
-      <span className="shape shape-coral" />
+      <span className="shape shape-cyan no-print" />
+      <span className="shape shape-coral no-print" />
       <section className="login-panel">
         <div className="login-art">
           <Image
@@ -775,19 +775,23 @@ function HistoryScreen({
   const [filterDate, setFilterDate] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const itemsPerPage = 10;
 
   const availableYears = useMemo(() => {
+    if (!mounted) return [];
     const currentYear = new Date().getFullYear();
     const years = [];
     for (let y = currentYear; y >= 2025; y--) {
       years.push(y.toString());
     }
     return years;
-  }, []);
+  }, [mounted]);
 
   const availableMonths = useMemo(() => {
-    if (filterYear === "all") return [];
+    if (!mounted || filterYear === "all") return [];
     const today = new Date();
     const isCurrentYear = parseInt(filterYear) === today.getFullYear();
     const maxMonth = isCurrentYear ? today.getMonth() + 1 : 12;
@@ -796,10 +800,10 @@ function HistoryScreen({
       months.push(m.toString().padStart(2, "0"));
     }
     return months;
-  }, [filterYear]);
+  }, [mounted, filterYear]);
 
   const availableDates = useMemo(() => {
-    if (filterYear === "all" || filterMonth === "all") return [];
+    if (!mounted || filterYear === "all" || filterMonth === "all") return [];
     const today = new Date();
     const y = parseInt(filterYear);
     const m = parseInt(filterMonth);
@@ -811,7 +815,7 @@ function HistoryScreen({
       dates.push(d.toString().padStart(2, "0"));
     }
     return dates;
-  }, [filterYear, filterMonth]);
+  }, [mounted, filterYear, filterMonth]);
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((t) => {
@@ -890,7 +894,7 @@ function HistoryScreen({
           disabled={filterYear === "all"}
         >
           {filterYear === "all" ? (
-            <option value="disabled" disabled>Pilih Tahun Dulu</option>
+            <option value="disabled">Pilih Tahun Dulu</option>
           ) : (
             <>
               <option value="all">Semua Bulan</option>
@@ -906,9 +910,9 @@ function HistoryScreen({
           disabled={filterYear === "all" || filterMonth === "all"}
         >
           {filterYear === "all" ? (
-            <option value="disabled" disabled>Pilih Tahun Dulu</option>
+            <option value="disabled">Pilih Tahun Dulu</option>
           ) : filterMonth === "all" ? (
-            <option value="disabled" disabled>Pilih Bulan Dulu</option>
+            <option value="disabled">Pilih Bulan Dulu</option>
           ) : (
             <>
               <option value="all">Semua Tanggal</option>
@@ -1332,11 +1336,17 @@ function ExportModal({ onClose, onExport }: { onClose: () => void, onExport: () 
 }
 
 function PrintReportHeader({ title, period }: { title: string; period: string }) {
-  const today = new Intl.DateTimeFormat("id-ID", { 
-    day: "numeric", 
-    month: "long", 
-    year: "numeric" 
-  }).format(new Date());
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const today = useMemo(() => {
+    if (!mounted) return "";
+    return new Intl.DateTimeFormat("id-ID", { 
+      day: "numeric", 
+      month: "long", 
+      year: "numeric" 
+    }).format(new Date());
+  }, [mounted]);
 
   return (
     <div className="report-header-print">
