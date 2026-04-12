@@ -26,11 +26,6 @@ const rupiah = new Intl.NumberFormat("id-ID", {
 });
 
 
-const expenseBreakdown = [
-  { label: "Pemasukan", value: 64, color: "#059D00" },
-  { label: "Pengeluaran", value: 36, color: "#D60042" },
-];
-
 const menuItems = [
   { href: "/", label: "Dashboard" },
   { href: "/histori", label: "Histori" },
@@ -48,11 +43,17 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [editData, setEditData] = useState<Transaction | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    action: "submit" | "delete" | "edit" | null;
+    data?: any;
+  }>({ isOpen: false, action: null });
   const [form, setForm] = useState({
     date: "2026-04-12",
     title: "",
     atas_nama: "",
-    type: "income" as TransactionType,
+    type: "Pemasukan" as TransactionType,
     metode_pembayaran: "Tunai",
     amount: "",
   });
@@ -106,24 +107,29 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     };
   }, [transactions]);
 
-  async function submitTransaction(event: React.FormEvent<HTMLFormElement>) {
+  function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const amount = Number(form.amount);
     if (!form.title.trim() || !amount) {
       return;
     }
+    setConfirmModal({ isOpen: true, action: "submit", data: { ...form, amount } });
+  }
+
+  async function executeSubmit() {
+    const data = confirmModal.data;
+    setConfirmModal({ isOpen: false, action: null });
 
     setIsSubmitting(true);
 
     const payload = {
       action: "CREATE",
-      tanggal: form.date,
-      keterangan: form.title,
-      atas_nama: form.atas_nama,
-      jenis: form.type,
-      metode_pembayaran: form.metode_pembayaran,
-      nominal: amount,
+      tanggal: data.date,
+      keterangan: data.title,
+      atas_nama: data.atas_nama,
+      jenis: data.type,
+      metode_pembayaran: data.metode_pembayaran,
+      nominal: data.amount,
     };
 
     try {
@@ -137,12 +143,12 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
       setTransactions((items) => [
         {
           id: `temp-${Date.now()}`,
-          date: form.date,
-          title: form.title,
-          atas_nama: form.atas_nama,
-          type: form.type,
-          metode_pembayaran: form.metode_pembayaran,
-          amount,
+          date: data.date,
+          title: data.title,
+          atas_nama: data.atas_nama,
+          type: data.type,
+          metode_pembayaran: data.metode_pembayaran,
+          amount: data.amount,
           created_at: new Date().toISOString().replace("T", " ").slice(0, 19),
         },
         ...items,
@@ -165,13 +171,17 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     }
   }
 
-  async function deleteTransaction(id: string) {
+  function requestDelete(id: string) {
     if (id.startsWith("temp-")) {
       showToast("Transaksi sedang diproses ke server, coba sebentar lagi.", "error");
       return;
     }
-    if (!confirm("Apakah Anda yakin ingin menghapus transaksi ini?")) return;
-    
+    setConfirmModal({ isOpen: true, action: "delete", data: id });
+  }
+
+  async function executeDelete() {
+    const id = confirmModal.data;
+    setConfirmModal({ isOpen: false, action: null });
     const prev = [...transactions];
     setTransactions((items) => items.filter((i) => i.id !== id));
 
@@ -186,6 +196,37 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
       console.error("Gagal menghapus:", err);
       setTransactions(prev);
       showToast("Gagal menghapus transaksi!", "error");
+    }
+  }
+
+  async function executeEdit() {
+    const updatedData: Transaction = confirmModal.data;
+    setConfirmModal({ isOpen: false, action: null });
+    setEditData(null);
+    
+    const prev = [...transactions];
+    setTransactions((items) => items.map((i) => i.id === updatedData.id ? updatedData : i));
+
+    try {
+      await fetch(GAS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify({
+          action: "UPDATE",
+          id_transaksi: updatedData.id,
+          tanggal: updatedData.date,
+          keterangan: updatedData.title,
+          atas_nama: updatedData.atas_nama,
+          jenis: updatedData.type,
+          metode_pembayaran: updatedData.metode_pembayaran,
+          nominal: updatedData.amount
+        })
+      });
+      showToast("Transaksi berhasil diperbarui!", "success");
+    } catch (err) {
+      console.error("Gagal mengedit:", err);
+      setTransactions(prev);
+      showToast("Gagal memperbarui transaksi!", "error");
     }
   }
 
@@ -229,6 +270,53 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         aria-label="Tutup sidebar"
         onClick={() => setSidebarOpen(false)}
       />
+      
+      {editData && (
+        <EditTransactionModal 
+          item={editData} 
+          onClose={() => setEditData(null)} 
+          onSubmit={(updated) => {
+            setConfirmModal({ isOpen: true, action: "edit", data: updated });
+          }} 
+        />
+      )}
+
+      {confirmModal.isOpen && (
+        <ConfirmModal
+          isOpen={true}
+          title={
+            confirmModal.action === "submit" ? "Konfirmasi Transaksi" :
+            confirmModal.action === "edit" ? "Konfirmasi Perubahan" : "Konfirmasi Hapus"
+          }
+          onConfirm={
+            confirmModal.action === "submit" ? executeSubmit :
+            confirmModal.action === "edit" ? executeEdit : executeDelete
+          }
+          onCancel={() => setConfirmModal({ isOpen: false, action: null })}
+          confirmText={
+            confirmModal.action === "submit" ? "Ya, Simpan" :
+            confirmModal.action === "edit" ? "Ya, Perbarui" : "Ya, Hapus"
+          }
+          isDanger={confirmModal.action === "delete"}
+        >
+          {confirmModal.action === "delete" ? (
+            <p>Apakah Anda yakin ingin menghapus transaksi ini? Data yang dihapus tidak dapat dikembalikan.</p>
+          ) : (
+            <>
+              <p>Apakah data berikut sudah benar?</p>
+              <ul>
+                <li><strong>Tanggal:</strong> {formatDate(confirmModal.data.date)}</li>
+                <li><strong>Keterangan:</strong> {confirmModal.data.title}</li>
+                <li><strong>Atas Nama:</strong> {confirmModal.data.atas_nama || "-"}</li>
+                <li><strong>Metode:</strong> {confirmModal.data.metode_pembayaran}</li>
+                <li><strong>Tipe:</strong> {confirmModal.data.type}</li>
+                <li><strong>Nominal:</strong> {rupiah.format(confirmModal.data.amount)}</li>
+              </ul>
+            </>
+          )}
+        </ConfirmModal>
+      )}
+
       <Sidebar screen={screen} onNavigate={() => setSidebarOpen(false)} />
       <section className="workspace">
         <span className="shape shape-cyan" />
@@ -266,7 +354,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             transactions={transactions}
             onFormChange={setForm}
             onTypeChange={changeFormType}
-            onSubmit={submitTransaction}
+            onSubmit={handleFormSubmit}
             isSubmitting={isSubmitting}
             isLoading={isLoading}
           />
@@ -282,7 +370,8 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
           <KelolaScreen 
             transactions={transactions}
             isLoading={isLoading}
-            onDelete={deleteTransaction}
+            onDelete={requestDelete}
+            onEdit={setEditData}
           />
         )}
       </section>
@@ -444,16 +533,7 @@ function DashboardScreen({
           <p>Graphic statistic</p>
           <h2>Pengeluaran bulan ini</h2>
         </div>
-        <DonutChart />
-        <div className="legend-list">
-          {expenseBreakdown.map((item) => (
-            <span key={item.label}>
-              <i style={{ background: item.color }} />
-              {item.label}
-              <b>{item.value}%</b>
-            </span>
-          ))}
-        </div>
+        <DonutChart income={totals.income} expense={totals.expense} />
       </section>
 
       <form className={`transaction-form ${formType}`} onSubmit={onSubmit}>
@@ -617,16 +697,7 @@ function HistoryScreen({
           <p>Monthly expense</p>
           <strong>{rupiah.format(totals.expense)}</strong>
         </div>
-        <DonutChart />
-        <div className="legend-list">
-          {expenseBreakdown.map((item) => (
-            <span key={item.label}>
-              <i style={{ background: item.color }} />
-              {item.label}
-              <b>{item.value}%</b>
-            </span>
-          ))}
-        </div>
+        <DonutChart income={totals.income} expense={totals.expense} />
       </section>
 
       <section className="history-metrics">
@@ -746,10 +817,12 @@ function KelolaScreen({
   transactions,
   isLoading,
   onDelete,
+  onEdit,
 }: {
   transactions: Transaction[];
   isLoading?: boolean;
   onDelete: (id: string) => void;
+  onEdit: (item: Transaction) => void;
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -788,7 +861,7 @@ function KelolaScreen({
                 </tr>
               ) : (
                 currentTransactions.map((item) => (
-                  <KelolaRow item={item} key={item.id} onDelete={onDelete} />
+                  <KelolaRow item={item} key={item.id} onDelete={onDelete} onEdit={onEdit} />
                 ))
               )}
             </tbody>
@@ -816,7 +889,7 @@ function KelolaScreen({
   );
 }
 
-function KelolaRow({ item, onDelete }: { item: Transaction; onDelete: (id: string) => void }) {
+function KelolaRow({ item, onDelete, onEdit }: { item: Transaction; onDelete: (id: string) => void; onEdit: (item: Transaction) => void }) {
   return (
     <tr className={`history-row ${item.type}`}>
       <td style={{ whiteSpace: "nowrap" }}>{formatDate(item.date)}</td>
@@ -833,7 +906,7 @@ function KelolaRow({ item, onDelete }: { item: Transaction; onDelete: (id: strin
       </td>
       <td style={{ textAlign: "center" }}>
         <div className="action-buttons">
-          <button type="button" className="action-btn edit" title="Edit" onClick={() => alert("Fitur Edit akan segera hadir!")}>✎</button>
+          <button type="button" className="action-btn edit" title="Edit" onClick={() => onEdit(item)}>✎</button>
           <button type="button" className="action-btn delete" title="Hapus" onClick={() => onDelete(item.id)}>✕</button>
         </div>
       </td>
@@ -841,11 +914,119 @@ function KelolaRow({ item, onDelete }: { item: Transaction; onDelete: (id: strin
   );
 }
 
-function DonutChart() {
+function ConfirmModal({
+  isOpen,
+  title,
+  children,
+  onConfirm,
+  onCancel,
+  confirmText = "Konfirmasi",
+  isDanger = false,
+}: {
+  isOpen: boolean;
+  title: string;
+  children: React.ReactNode;
+  onConfirm: () => void;
+  onCancel: () => void;
+  confirmText?: string;
+  isDanger?: boolean;
+}) {
+  if (!isOpen) return null;
   return (
-    <div className="donut-chart" aria-label="Grafik pengeluaran">
-      <span />
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <h2>{title}</h2>
+        <div className="modal-body">{children}</div>
+        <div className="modal-actions">
+          <button type="button" className="btn-cancel" onClick={onCancel}>Batal</button>
+          <button type="button" className={`btn-confirm ${isDanger ? 'danger' : ''}`} onClick={onConfirm}>{confirmText}</button>
+        </div>
+      </div>
     </div>
+  );
+}
+
+function EditTransactionModal({
+  item,
+  onClose,
+  onSubmit
+}: {
+  item: Transaction;
+  onClose: () => void;
+  onSubmit: (updated: Transaction) => void;
+}) {
+  const [form, setForm] = useState(item);
+  const metodeOptions = ["Tunai", "Transfer", "E-Wallet", "Kartu Kredit"];
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-content" style={{ maxWidth: '500px' }}>
+        <h2>Edit Transaksi</h2>
+        <form onSubmit={(e) => { e.preventDefault(); onSubmit(form); }}>
+          <div className="form-grid" style={{ marginBottom: '14px' }}>
+            <label>Tanggal <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required /></label>
+            <label>Keterangan <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></label>
+          </div>
+          <div className="form-grid" style={{ marginBottom: '14px' }}>
+            <label>Atas Nama <input value={form.atas_nama} onChange={(e) => setForm({ ...form, atas_nama: e.target.value })} /></label>
+            <label>Metode
+              <select value={form.metode_pembayaran} onChange={(e) => setForm({ ...form, metode_pembayaran: e.target.value })}>
+                {metodeOptions.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </label>
+          </div>
+          <div className="form-grid">
+            <label>Tipe
+              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as TransactionType })}>
+                <option value="Pemasukan">Pemasukan</option>
+                <option value="Pengeluaran">Pengeluaran</option>
+              </select>
+            </label>
+            <label>Nominal <input inputMode="numeric" value={form.amount ? Number(form.amount).toLocaleString('id-ID') : ''} onChange={(e) => setForm({ ...form, amount: Number(e.target.value.replace(/\D/g, "")) })} required /></label>
+          </div>
+          <div className="modal-actions" style={{ marginTop: '24px' }}>
+            <button type="button" className="btn-cancel" onClick={onClose}>Batal</button>
+            <button type="submit" className="btn-confirm">Lanjut</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function DonutChart({ income, expense }: { income: number; expense: number }) {
+  const total = income + expense;
+  const incomePct = total === 0 ? 0 : Math.round((income / total) * 100);
+  const expensePct = total === 0 ? 0 : 100 - incomePct;
+
+  const breakdown = [
+    { label: "Pemasukan", value: incomePct, color: "var(--green)" },
+    { label: "Pengeluaran", value: expensePct, color: "var(--rose)" },
+  ];
+
+  return (
+    <>
+      <div 
+        className="donut-chart" 
+        aria-label="Grafik pengeluaran"
+        style={{
+          background: total === 0 
+            ? "conic-gradient(var(--border) 0 100%)" 
+            : `conic-gradient(var(--green) 0 ${incomePct}%, var(--rose) ${incomePct}% 100%)`
+        }}
+      >
+        <span />
+      </div>
+      <div className="legend-list">
+        {breakdown.map((item) => (
+          <span key={item.label}>
+            <i style={{ background: item.color }} />
+            {item.label}
+            <b>{item.value}%</b>
+          </span>
+        ))}
+      </div>
+    </>
   );
 }
 

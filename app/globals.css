@@ -395,10 +395,6 @@ a, button { -webkit-tap-highlight-color: transparent; }
   width: 120px;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: conic-gradient(
-    var(--green) 0 64%,
-    var(--rose)  64% 100%
-  );
 }
 
 .donut-chart span {
@@ -927,6 +923,67 @@ select:focus {
 
 .is-dark .action-btn.delete { background: rgb(214 0 66 / 20%); }
 .is-dark .action-btn.delete:hover { background: var(--rose); color: #fff; }
+
+/* ─── Modal / Popup ─────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: rgb(0 0 0 / 40%);
+  backdrop-filter: blur(4px);
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  width: 100%;
+  max-width: 420px;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 40px rgb(0 0 0 / 20%);
+  border: 1px solid var(--border);
+}
+
+.is-dark .modal-content { background: #2a2b36; }
+
+.modal-content h2 { margin: 0 0 16px; font-size: 20px; font-weight: 800; }
+
+.modal-body {
+  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.is-dark .modal-body { color: var(--muted-dark); }
+
+.modal-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.is-dark .modal-body ul { background: rgb(0 0 0 / 20%); }
+
+.modal-body li { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.modal-body li:last-child { margin-bottom: 0; }
+.modal-body li strong { color: var(--fg); }
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.modal-actions button { padding: 10px 18px; border-radius: 10px; font-size: 14px; font-weight: 700; }
+
+.btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--fg); }
+.btn-cancel:hover { background: var(--shape-a); }
+.is-dark .btn-cancel:hover { background: rgb(255 255 255 / 10%); }
+
+.btn-confirm { background: var(--green); color: #fff; border: none; cursor: pointer; transition: all 0.2s;}
+.btn-confirm:hover { filter: brightness(1.1); }
+.btn-confirm.danger { background: var(--rose); }
 
 /* ─── Toast Notification ────────────────────────────── */
 .toast-wrapper {
