@@ -79,7 +79,7 @@ const menuItems = [
   { href: "/login", label: "Logout" },
 ];
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzCuN2l-8QSOah_mCjxI-Cdxl7NgFunJL1D6fL1PRXdQP2JRqSyAjket28fjCP__NXb/exec";
+const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || "";
 
 export default function FinanceApp({ screen }: { screen: Screen }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
