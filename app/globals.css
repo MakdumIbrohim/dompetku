@@ -260,25 +260,25 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 
 .logout-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 46px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 12px;
-  background: var(--rose);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 12px var(--rose-shadow);
-  transition: all 160ms ease;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  height: 46px !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: var(--rose) !important;
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px var(--rose-shadow) !important;
+  transition: all 160ms ease !important;
 }
 
 .logout-button:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 6px 16px var(--rose-shadow);
+  filter: brightness(1.1) !important;
+  box-shadow: 0 6px 16px var(--rose-shadow) !important;
 }
 
 .logout-button svg {
