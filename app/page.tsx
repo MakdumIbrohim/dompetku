@@ -1,5 +1,9 @@
-import { redirect } from "next/navigation";
+import FinanceApp from "./components/finance-app";
 
-export default function Home() {
-  redirect("/login");
+export const metadata = {
+  title: "Dashboard - Dompetku",
+};
+
+export default function HomePage() {
+  return <FinanceApp screen="dashboard" />;
 }

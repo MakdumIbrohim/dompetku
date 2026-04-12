@@ -726,29 +726,6 @@ select:focus {
 .transaction-row.income b,
 .history-row.income b { color: var(--green); }
 
-.delete-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: var(--rose-light);
-  color: var(--rose);
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: all 140ms ease;
-}
-
-.is-dark .delete-button { background: rgb(214 0 66 / 20%); }
-
-.delete-button:hover {
-  opacity: 1;
-  background: var(--rose);
-  color: #fff;
-}
 
 /* ─── History page ──────────────────────────────────── */
 .history-layout {
@@ -905,6 +882,51 @@ select:focus {
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ─── Action Buttons (Kelola Data) ──────────────────── */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.action-btn.edit {
+  background: #e6f0fa;
+  color: #0055b3;
+}
+
+.action-btn.edit:hover { background: #0055b3; color: #fff; }
+
+.is-dark .action-btn.edit {
+  background: rgb(0 85 179 / 20%);
+  color: #66b2ff;
+}
+
+.is-dark .action-btn.edit:hover { background: #0055b3; color: #fff; }
+
+.action-btn.delete {
+  background: var(--rose-light);
+  color: var(--rose);
+}
+
+.action-btn.delete:hover { background: var(--rose); color: #fff; }
+
+.is-dark .action-btn.delete { background: rgb(214 0 66 / 20%); }
+.is-dark .action-btn.delete:hover { background: var(--rose); color: #fff; }
 
 /* ─── Toast Notification ────────────────────────────── */
 .toast-wrapper {

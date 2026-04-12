@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-type Screen = "login" | "dashboard" | "histori";
-type TransactionType = "income" | "expense";
+type Screen = "login" | "dashboard" | "histori" | "kelola";
+type TransactionType = "Pemasukan" | "Pengeluaran";
 
 type Transaction = {
   id: string;
@@ -25,48 +25,6 @@ const rupiah = new Intl.NumberFormat("id-ID", {
   maximumFractionDigits: 0,
 });
 
-const seedTransactions: Transaction[] = [
-  {
-    id: "1",
-    date: "2026-04-12",
-    title: "Gaji bulanan",
-    atas_nama: "Brohim",
-    type: "income",
-    metode_pembayaran: "Transfer",
-    amount: 8500000,
-    created_at: "2026-04-12 08:00:00",
-  },
-  {
-    id: "2",
-    date: "2026-04-11",
-    title: "Belanja dapur",
-    atas_nama: "Brohim",
-    type: "expense",
-    metode_pembayaran: "Tunai",
-    amount: 425000,
-    created_at: "2026-04-11 10:30:00",
-  },
-  {
-    id: "3",
-    date: "2026-04-10",
-    title: "Internet rumah",
-    atas_nama: "Brohim",
-    type: "expense",
-    metode_pembayaran: "Transfer",
-    amount: 315000,
-    created_at: "2026-04-10 14:00:00",
-  },
-  {
-    id: "4",
-    date: "2026-04-09",
-    title: "Proyek desain",
-    atas_nama: "Client ABC",
-    type: "income",
-    metode_pembayaran: "Transfer",
-    amount: 1400000,
-    created_at: "2026-04-09 16:45:00",
-  },
-];
 
 const expenseBreakdown = [
   { label: "Pemasukan", value: 64, color: "#059D00" },
@@ -74,8 +32,9 @@ const expenseBreakdown = [
 ];
 
 const menuItems = [
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/", label: "Dashboard" },
   { href: "/histori", label: "Histori" },
+  { href: "/kelola", label: "Kelola Data" },
   { href: "/login", label: "Logout" },
 ];
 
@@ -83,7 +42,7 @@ const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || "";
 
 export default function FinanceApp({ screen }: { screen: Screen }) {
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [formType, setFormType] = useState<TransactionType>("income");
+  const [formType, setFormType] = useState<TransactionType>("Pemasukan");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -134,10 +93,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
 
   const totals = useMemo(() => {
     const income = transactions
-      .filter((item) => item.type === "income")
+      .filter((item) => item.type === "Pemasukan")
       .reduce((sum, item) => sum + item.amount, 0);
     const expense = transactions
-      .filter((item) => item.type === "expense")
+      .filter((item) => item.type === "Pengeluaran")
       .reduce((sum, item) => sum + item.amount, 0);
 
     return {
@@ -278,7 +237,13 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         <header className="workspace-header">
           <div>
             <p>Management Keuangan</p>
-            <h1>{screen === "dashboard" ? "Dashboard Dompetku" : "Histori Transaksi"}</h1>
+            <h1>
+              {screen === "dashboard" 
+                ? "Dashboard Dompetku" 
+                : screen === "histori" 
+                ? "Histori Transaksi" 
+                : "Kelola Data"}
+            </h1>
           </div>
           <button
             className="theme-button"
@@ -304,12 +269,17 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             onSubmit={submitTransaction}
             isSubmitting={isSubmitting}
             isLoading={isLoading}
-            onDelete={deleteTransaction}
           />
         )}
         {screen === "histori" && (
           <HistoryScreen 
             totals={totals} 
+            transactions={transactions}
+            isLoading={isLoading}
+          />
+        )}
+        {screen === "kelola" && (
+          <KelolaScreen 
             transactions={transactions}
             isLoading={isLoading}
             onDelete={deleteTransaction}
@@ -346,7 +316,7 @@ function Sidebar({
 }) {
   return (
     <aside className="sidebar">
-      <Link className="brand" href="/dashboard" onClick={onNavigate}>
+      <Link className="brand" href="/" onClick={onNavigate}>
         <Image src="/wallet-mark.svg" alt="Dompetku" width={48} height={48} />
         <span>
           <strong>Dompetku</strong>
@@ -379,7 +349,7 @@ function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" |
     setTimeout(() => {
       showToast("Berhasil masuk! Mengalihkan ke Dashboard...", "success");
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/");
       }, 1200);
     }, 800);
   }
@@ -431,7 +401,6 @@ function DashboardScreen({
   onSubmit,
   isSubmitting,
   isLoading,
-  onDelete,
 }: {
   form: { date: string; title: string; atas_nama: string; type: TransactionType; metode_pembayaran: string; amount: string };
   formType: TransactionType;
@@ -451,14 +420,13 @@ function DashboardScreen({
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   isSubmitting?: boolean;
   isLoading?: boolean;
-  onDelete?: (id: string) => void;
 }) {
   const metodeOptions = ["Tunai", "Transfer", "E-Wallet", "Kartu Kredit"];
 
   const inputAmount = Number(form.amount) || 0;
-  const projectedIncome = formType === "income" ? totals.balance + inputAmount : totals.balance;
-  const projectedExpense = formType === "expense" ? totals.balance - inputAmount : totals.balance;
-  const isExpense = formType === "expense" && inputAmount > totals.balance;
+  const projectedIncome = formType === "Pemasukan" ? totals.balance + inputAmount : totals.balance;
+  const projectedExpense = formType === "Pengeluaran" ? totals.balance - inputAmount : totals.balance;
+  const isExpense = formType === "Pengeluaran" && inputAmount > totals.balance;
 
   return (
     <div className="dashboard-grid">
@@ -491,16 +459,16 @@ function DashboardScreen({
       <form className={`transaction-form ${formType}`} onSubmit={onSubmit}>
         <div className="segmented-control">
           <button
-            className={formType === "income" ? "selected" : ""}
+            className={formType === "Pemasukan" ? "selected" : ""}
             type="button"
-            onClick={() => onTypeChange("income")}
+            onClick={() => onTypeChange("Pemasukan")}
           >
             Pemasukan
           </button>
           <button
-            className={formType === "expense" ? "selected" : ""}
+            className={formType === "Pengeluaran" ? "selected" : ""}
             type="button"
-            onClick={() => onTypeChange("expense")}
+            onClick={() => onTypeChange("Pengeluaran")}
           >
             Pengeluaran
           </button>
@@ -523,7 +491,7 @@ function DashboardScreen({
             Keterangan
             <input
               value={form.title}
-              placeholder={formType === "income" ? "Pemasukan untuk..." : "Pengeluaran untuk..."}
+              placeholder={formType === "Pemasukan" ? "Contoh: gaji bulanan" : "Pengeluaran untuk..."}
               onChange={(event) =>
                 onFormChange((current) => ({
                   ...current,
@@ -592,8 +560,8 @@ function DashboardScreen({
                 <div className="arrow">→</div>
                 <div className="balance-change right">
                   <span>Menjadi</span>
-                  <strong className={formType === "income" ? "income" : "expense"}>
-                    {rupiah.format(formType === "income" ? projectedIncome : projectedExpense)}
+                  <strong className={formType === "Pemasukan" ? "Pemasukan" : "Pengeluaran"}>
+                    {rupiah.format(formType === "Pemasukan" ? projectedIncome : projectedExpense)}
                   </strong>
                 </div>
               </div>
@@ -618,7 +586,7 @@ function DashboardScreen({
             <p style={{ gridColumn: "1 / -1", textAlign: "center", padding: "20px", color: "var(--muted)" }}>Belum ada transaksi.</p>
           ) : (
             transactions.slice(0, 5).map((item) => (
-              <TransactionRow item={item} key={item.id} onDelete={onDelete} />
+              <TransactionRow item={item} key={item.id} />
             ))
           )}
         </div>
@@ -631,12 +599,10 @@ function HistoryScreen({
   totals,
   transactions,
   isLoading,
-  onDelete,
 }: {
   totals: { income: number; expense: number; balance: number };
   transactions: Transaction[];
   isLoading?: boolean;
-  onDelete?: (id: string) => void;
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -684,21 +650,20 @@ function HistoryScreen({
                 <th>Metode</th>
                 <th>Tipe</th>
                 <th>Nominal</th>
-                <th style={{ width: "40px" }}></th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Memuat data dari Spreadsheet...</td>
+                  <td colSpan={6} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Memuat data dari Spreadsheet...</td>
                 </tr>
               ) : currentTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada histori transaksi.</td>
+                  <td colSpan={6} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada histori transaksi.</td>
                 </tr>
               ) : (
                 currentTransactions.map((item) => (
-                  <HistoryRow item={item} key={item.id} onDelete={onDelete} />
+                  <HistoryRow item={item} key={item.id} />
                 ))
               )}
             </tbody>
@@ -735,10 +700,10 @@ function MetricCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-function TransactionRow({ item, onDelete }: { item: Transaction; onDelete?: (id: string) => void }) {
+function TransactionRow({ item }: { item: Transaction }) {
   return (
     <article className={`transaction-row ${item.type}`}>
-      <div className="row-icon">{item.type === "income" ? "+" : "-"}</div>
+      <div className="row-icon">{item.type === "Pemasukan" ? "+" : "-"}</div>
       <div>
         <strong>{item.title}</strong>
         <span>
@@ -746,24 +711,14 @@ function TransactionRow({ item, onDelete }: { item: Transaction; onDelete?: (id:
         </span>
       </div>
       <b>
-        {item.type === "income" ? "+" : "-"}
+        {item.type === "Pemasukan" ? "+" : "-"}
         {rupiah.format(item.amount)}
       </b>
-      {onDelete && (
-        <button 
-          type="button" 
-          onClick={() => onDelete(item.id)} 
-          className="delete-button"
-          title="Hapus"
-        >
-          ✕
-        </button>
-      )}
     </article>
   );
 }
 
-function HistoryRow({ item, onDelete }: { item: Transaction; onDelete?: (id: string) => void }) {
+function HistoryRow({ item }: { item: Transaction }) {
   return (
     <tr className={`history-row ${item.type}`}>
       <td style={{ whiteSpace: "nowrap" }}>{formatDate(item.date)}</td>
@@ -774,26 +729,113 @@ function HistoryRow({ item, onDelete }: { item: Transaction; onDelete?: (id: str
       <td>{item.metode_pembayaran}</td>
       <td>
         <span className={`type-badge ${item.type}`}>
-          {item.type === "income" ? "Pemasukan" : "Pengeluaran"}
+          {item.type === "Pemasukan" ? "Pemasukan" : "Pengeluaran"}
         </span>
       </td>
       <td style={{ whiteSpace: "nowrap" }}>
         <b>
-          {item.type === "income" ? "+" : "-"}
+          {item.type === "Pemasukan" ? "+" : "-"}
           {rupiah.format(item.amount)}
         </b>
       </td>
-      <td>
-        {onDelete && (
-          <button 
-            type="button" 
-            onClick={() => onDelete(item.id)} 
-            className="delete-button"
-            title="Hapus transaksi ini"
-          >
-            ✕
-          </button>
+    </tr>
+  );
+}
+
+function KelolaScreen({
+  transactions,
+  isLoading,
+  onDelete,
+}: {
+  transactions: Transaction[];
+  isLoading?: boolean;
+  onDelete: (id: string) => void;
+}) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const totalPages = Math.ceil(transactions.length / itemsPerPage);
+  const currentTransactions = transactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  return (
+    <div className="history-layout">
+      <section className="history-table">
+        <div className="section-title">
+          <p>Kelola Data Transaksi</p>
+          <span>{transactions.length} total data</span>
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Keterangan</th>
+                <th>Atas Nama</th>
+                <th>Metode</th>
+                <th>Tipe</th>
+                <th style={{ textAlign: "right" }}>Nominal</th>
+                <th style={{ width: "80px", textAlign: "center" }}>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Memuat data dari Spreadsheet...</td>
+                </tr>
+              ) : currentTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada data untuk dikelola.</td>
+                </tr>
+              ) : (
+                currentTransactions.map((item) => (
+                  <KelolaRow item={item} key={item.id} onDelete={onDelete} />
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            >
+              Sebelumnya
+            </button>
+            <span>Halaman {currentPage} dari {totalPages}</span>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            >
+              Selanjutnya
+            </button>
+          </div>
         )}
+      </section>
+    </div>
+  );
+}
+
+function KelolaRow({ item, onDelete }: { item: Transaction; onDelete: (id: string) => void }) {
+  return (
+    <tr className={`history-row ${item.type}`}>
+      <td style={{ whiteSpace: "nowrap" }}>{formatDate(item.date)}</td>
+      <td><strong>{item.title}</strong></td>
+      <td>{item.atas_nama}</td>
+      <td>{item.metode_pembayaran}</td>
+      <td>
+        <span className={`type-badge ${item.type}`}>
+          {item.type === "Pemasukan" ? "Pemasukan" : "Pengeluaran"}
+        </span>
+      </td>
+      <td style={{ whiteSpace: "nowrap", textAlign: "right" }}>
+        <b>{item.type === "Pemasukan" ? "+" : "-"}{rupiah.format(item.amount)}</b>
+      </td>
+      <td style={{ textAlign: "center" }}>
+        <div className="action-buttons">
+          <button type="button" className="action-btn edit" title="Edit" onClick={() => alert("Fitur Edit akan segera hadir!")}>✎</button>
+          <button type="button" className="action-btn delete" title="Hapus" onClick={() => onDelete(item.id)}>✕</button>
+        </div>
       </td>
     </tr>
   );
@@ -832,5 +874,7 @@ function formatDate(value: string) {
 }
 
 function screenLabel(screen: Screen) {
-  return screen === "histori" ? "Histori" : "Dashboard";
+  if (screen === "histori") return "Histori";
+  if (screen === "kelola") return "Kelola Data";
+  return "Dashboard";
 }
