@@ -517,6 +517,12 @@ function HistoryScreen({
   totals: { income: number; expense: number; balance: number };
   transactions: Transaction[];
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const totalPages = Math.ceil(transactions.length / itemsPerPage);
+  const currentTransactions = transactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
   return (
     <div className="history-layout">
       <section className="history-summary">
@@ -547,16 +553,42 @@ function HistoryScreen({
           <p>Histori transaksi</p>
           <span>{transactions.length} data</span>
         </div>
-        <div className="table-head">
-          <span>Keterangan</span>
-          <span>Atas Nama</span>
-          <span>Metode</span>
-          <span>Tanggal</span>
-          <span>Nominal</span>
+        <div style={{ overflowX: "auto" }}>
+          <table>
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Keterangan</th>
+                <th>Atas Nama</th>
+                <th>Metode</th>
+                <th>Tipe</th>
+                <th>Nominal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentTransactions.map((item) => (
+                <HistoryRow item={item} key={item.id} />
+              ))}
+            </tbody>
+          </table>
         </div>
-        {transactions.map((item) => (
-          <HistoryRow item={item} key={item.id} />
-        ))}
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+            >
+              Sebelumnya
+            </button>
+            <span>Halaman {currentPage} dari {totalPages}</span>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            >
+              Selanjutnya
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );
@@ -591,16 +623,25 @@ function TransactionRow({ item }: { item: Transaction }) {
 
 function HistoryRow({ item }: { item: Transaction }) {
   return (
-    <article className={`history-row ${item.type}`}>
-      <strong>{item.title}</strong>
-      <span>{item.atas_nama}</span>
-      <span>{item.metode_pembayaran}</span>
-      <span>{formatDate(item.date)}</span>
-      <b>
-        {item.type === "income" ? "+" : "-"}
-        {rupiah.format(item.amount)}
-      </b>
-    </article>
+    <tr className={`history-row ${item.type}`}>
+      <td style={{ whiteSpace: "nowrap" }}>{formatDate(item.date)}</td>
+      <td>
+        <strong>{item.title}</strong>
+      </td>
+      <td>{item.atas_nama}</td>
+      <td>{item.metode_pembayaran}</td>
+      <td>
+        <span className={`type-badge ${item.type}`}>
+          {item.type === "income" ? "Pemasukan" : "Pengeluaran"}
+        </span>
+      </td>
+      <td style={{ whiteSpace: "nowrap" }}>
+        <b>
+          {item.type === "income" ? "+" : "-"}
+          {rupiah.format(item.amount)}
+        </b>
+      </td>
+    </tr>
   );
 }
 

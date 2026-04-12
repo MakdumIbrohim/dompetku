@@ -774,43 +774,112 @@ select:focus {
 /* ─── History table ─────────────────────────────────── */
 .history-table { padding: 24px; }
 
-.table-head,
-.history-row {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr 0.7fr 0.7fr 1fr;
-  gap: 14px;
-  align-items: center;
+.history-table table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 680px;
 }
 
-.table-head {
-  margin-bottom: 6px;
+.history-table th {
   border-bottom: 1px solid var(--border);
-  padding: 0 12px 12px;
+  padding: 12px 14px;
   color: var(--muted);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.is-dark .table-head { border-bottom-color: var(--border); color: var(--muted-dark); }
+.is-dark .history-table th { border-bottom-color: var(--border); color: var(--muted-dark); }
 
 .history-row {
-  min-height: 54px;
-  border-radius: 12px;
-  padding: 0 12px;
   transition: background 140ms;
 }
+
+.history-row td {
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.history-row:last-child td { border-bottom: none; }
 
 .history-row:hover { background: rgb(255 255 255 / 60%); }
 .is-dark .history-row:hover { background: rgb(255 255 255 / 7%); }
 
-.history-row strong,
-.history-row span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.history-table th:last-child,
+.history-table td:last-child {
+  text-align: right;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.type-badge.income {
+  background: var(--green-light);
+  color: var(--green);
+}
+
+.type-badge.expense {
+  background: var(--rose-light);
+  color: var(--rose);
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.pagination span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.is-dark .pagination span { color: var(--muted-dark); }
+
+.pagination button {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.is-dark .pagination button { background: rgb(255 255 255 / 6%); }
+
+.pagination button:hover:not(:disabled) {
+  background: var(--green-light);
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.is-dark .pagination button:hover:not(:disabled) {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* ─── Login page ────────────────────────────────────── */
@@ -986,15 +1055,6 @@ select:focus {
   .form-grid,
   .form-grid.wide,
   .login-panel { grid-template-columns: 1fr; }
-
-  .table-head { display: none; }
-
-  .history-row {
-    grid-template-columns: 1fr;
-    gap: 6px;
-    height: auto;
-    padding: 14px 12px;
-  }
 
   .login-art { min-height: 220px; }
 }
