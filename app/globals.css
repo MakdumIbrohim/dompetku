@@ -550,6 +550,93 @@ select:focus {
   box-shadow: 0 8px 22px var(--rose-shadow);
 }
 
+/* ─── Projection preview ───────────────────────────────── */
+.projection-card {
+  padding: 18px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px var(--border);
+}
+
+.projection-card > p {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.projection-content {
+  display: grid;
+  gap: 12px;
+}
+
+.projection-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--bg);
+  border-radius: 12px;
+}
+
+.balance-change {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.balance-change.right {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.balance-change span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.balance-change b {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.balance-change strong {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.balance-change strong.income {
+  color: var(--green);
+}
+
+.balance-change strong.expense {
+  color: var(--rose);
+}
+
+.arrow {
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 700;
+  opacity: 0.5;
+}
+
+.warning-badge {
+  text-align: center;
+  padding: 10px;
+  background: var(--rose-light);
+  color: var(--rose);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
 /* ─── Recent transactions card ──────────────────────── */
 .recent-card {
   grid-column: 1 / -1;

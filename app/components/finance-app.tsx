@@ -344,6 +344,11 @@ function DashboardScreen({
 }) {
   const metodeOptions = ["Tunai", "Transfer", "E-Wallet", "Kartu Kredit"];
 
+  const inputAmount = Number(form.amount) || 0;
+  const projectedIncome = formType === "income" ? totals.balance + inputAmount : totals.balance;
+  const projectedExpense = formType === "expense" ? totals.balance - inputAmount : totals.balance;
+  const isExpense = formType === "expense" && inputAmount > totals.balance;
+
   return (
     <div className="dashboard-grid">
       <section className="summary-card balance-card">
@@ -464,6 +469,27 @@ function DashboardScreen({
             />
           </label>
         </div>
+        {inputAmount > 0 && (
+          <div className="projection-card">
+            <p>Perkiraan saldo</p>
+            <div className="projection-content">
+              <div className="projection-item">
+                <div className="balance-change">
+                  <span>Saat ini</span>
+                  <b>{rupiah.format(totals.balance)}</b>
+                </div>
+                <div className="arrow">→</div>
+                <div className="balance-change right">
+                  <span>Menjadi</span>
+                  <strong className={formType === "income" ? "income" : "expense"}>
+                    {rupiah.format(formType === "income" ? projectedIncome : projectedExpense)}
+                  </strong>
+                </div>
+              </div>
+              {isExpense && <div className="warning-badge">Pengeluaran melebihi saldo saat ini!</div>}
+            </div>
+          </div>
+        )}
         <button className="primary-action" type="submit">
           Simpan transaksi
         </button>
