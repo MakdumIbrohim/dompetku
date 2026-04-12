@@ -58,10 +58,8 @@ const seedTransactions: Transaction[] = [
 ];
 
 const expenseBreakdown = [
-  { label: "Food", value: 42, color: "#ff7058" },
-  { label: "Bills", value: 26, color: "#12d6df" },
-  { label: "Transport", value: 18, color: "#f6b74b" },
-  { label: "Fun", value: 14, color: "#ff5fa2" },
+  { label: "Pemasukan", value: 64, color: "#16a34a" },
+  { label: "Pengeluaran", value: 36, color: "#dc2626" },
 ];
 
 const menuItems = [
@@ -310,7 +308,7 @@ function DashboardScreen({
         </div>
       </section>
 
-      <form className="transaction-form" onSubmit={onSubmit}>
+      <form className={`transaction-form ${formType}`} onSubmit={onSubmit}>
         <div className="segmented-control">
           <button
             className={formType === "income" ? "selected" : ""}
