@@ -720,7 +720,7 @@ select:focus {
   }
 
   .menu-button {
-    position: fixed;
+    position: absolute;
     top: 14px;
     left: 14px;
     z-index: 12;
@@ -736,6 +736,10 @@ select:focus {
     background: #111827;
     box-shadow: 0 12px 24px rgb(17 24 39 / 18%);
     cursor: pointer;
+  }
+
+  .sidebar-open .menu-button {
+    display: none;
   }
 
   .menu-button span {
