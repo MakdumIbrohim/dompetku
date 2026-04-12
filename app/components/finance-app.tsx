@@ -276,7 +276,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     >
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <button
-        className="menu-button"
+        className="menu-button no-print"
         type="button"
         aria-label="Buka sidebar"
         onClick={() => setSidebarOpen(true)}
@@ -340,9 +340,9 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
 
       <Sidebar screen={screen} onNavigate={() => setSidebarOpen(false)} />
       <section className="workspace">
-        <span className="shape shape-cyan" />
-        <span className="shape shape-coral" />
-        <span className="shape shape-gold" />
+        <span className="shape shape-cyan no-print" />
+        <span className="shape shape-coral no-print" />
+        <span className="shape shape-gold no-print" />
         <header className="workspace-header">
           <div>
             <p>Management Keuangan</p>
@@ -436,6 +436,16 @@ function LogOutIcon() {
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
     </svg>
   );
 }
@@ -764,6 +774,7 @@ function HistoryScreen({
   const [filterMonth, setFilterMonth] = useState<string>("all");
   const [filterDate, setFilterDate] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const itemsPerPage = 10;
 
   const availableYears = useMemo(() => {
@@ -846,8 +857,25 @@ function HistoryScreen({
 
   return (
     <div className="history-layout">
-      <div className="section-title" style={{ marginBottom: "8px" }}>
+      <PrintReportHeader 
+        title="Laporan Histori Transaksi" 
+        period={`${filterYear !== 'all' ? filterYear : 'Semua Tahun'}${filterMonth !== 'all' ? ' - ' + getMonthName(filterMonth) : ''}${filterDate !== 'all' ? ' - ' + filterDate : ''}`}
+      />
+      {isExportModalOpen && (
+        <ExportModal 
+          onClose={() => setIsExportModalOpen(false)} 
+          onExport={() => {
+            setIsExportModalOpen(false);
+            window.print();
+          }} 
+        />
+      )}
+      <div className="section-title no-print" style={{ marginBottom: "8px" }}>
         <p>Filter Periode Waktu</p>
+        <button className="export-btn no-print" onClick={() => setIsExportModalOpen(true)}>
+          <DownloadIcon />
+          Export PDF
+        </button>
       </div>
       <div className="history-filters">
         <select value={filterYear} onChange={handleYearChange} aria-label="Filter Tahun">
@@ -1261,4 +1289,65 @@ function screenLabel(screen: Screen) {
   if (screen === "histori") return "Histori";
   if (screen === "kelola") return "Kelola Data";
   return "Dashboard";
+}
+
+function ExportModal({ onClose, onExport }: { onClose: () => void, onExport: () => void }) {
+  return (
+    <div className="modal-backdrop no-print">
+      <div className="modal-content" style={{ maxWidth: '500px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ margin: 0 }}>Ekspor ke PDF</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: 'var(--muted)' }}>✕</button>
+        </div>
+        
+        <div className="modal-body">
+          <div className="info-card-premium">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <div>
+              <strong>Informasi Penting</strong>
+              <p style={{ margin: '4px 0 0', fontSize: '13px', opacity: 0.9 }}>
+                Dokumen PDF yang dihasilkan akan mengikuti data yang tampil saat ini (berdasarkan filter tahun, bulan, dan tanggal yang Anda pilih).
+              </p>
+            </div>
+          </div>
+          <p>Pastikan Anda telah mengatur filter periode waktu dengan benar sebelum mencetak dokumen ini.</p>
+        </div>
+
+        <div className="modal-actions" style={{ borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
+          <button type="button" className="btn-cancel" onClick={onClose}>Batal</button>
+          <button type="button" className="btn-confirm" onClick={onExport} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px' }}>
+            <div style={{ width: '18px', height: '18px', display: 'flex', alignItems: 'center' }}>
+              <DownloadIcon />
+            </div>
+            Cetak PDF Sekarang
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PrintReportHeader({ title, period }: { title: string; period: string }) {
+  const today = new Intl.DateTimeFormat("id-ID", { 
+    day: "numeric", 
+    month: "long", 
+    year: "numeric" 
+  }).format(new Date());
+
+  return (
+    <div className="report-header-print">
+      <div className="report-info">
+        <h1>{title}</h1>
+        <p>Aplikasi Keuangan Dompetku</p>
+      </div>
+      <div className="report-meta">
+        <div><strong>Periode:</strong> {period}</div>
+        <div><span>Dicetak pada:</span> {today}</div>
+      </div>
+    </div>
+  );
 }
