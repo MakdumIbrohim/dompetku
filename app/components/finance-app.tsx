@@ -846,6 +846,9 @@ function HistoryScreen({
 
   return (
     <div className="history-layout">
+      <div className="section-title" style={{ marginBottom: "8px" }}>
+        <p>Filter Periode Waktu</p>
+      </div>
       <div className="history-filters">
         <select value={filterYear} onChange={handleYearChange} aria-label="Filter Tahun">
           <option value="all">Semua Tahun</option>
