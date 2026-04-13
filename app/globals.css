@@ -1485,11 +1485,14 @@ select:focus {
 }
 
 @media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   body, .web-shell, .workspace, .history-layout, .history-table {
     background: white !important;
     color: black !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
 
   /* Reset Grid agar tidak ada kolom kosong saat sidebar disembunyikan */
@@ -1575,6 +1578,11 @@ select:focus {
     width: 100px !important; 
     height: 100px !important; 
     margin: 0 !important;
+  }
+
+  .donut-chart span {
+    background: white !important;
+    inset: 30px !important; /* Menyesuaikan ukuran lubang karena ukuran chart lebih kecil saat diprint */
   }
   
   .legend-list { font-size: 10px !important; gap: 8px !important; }

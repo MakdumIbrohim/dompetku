@@ -233,7 +233,6 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
                 <li><strong>Tanggal:</strong> {formatDate(confirmModal.data.date)}</li>
                 <li><strong>Keterangan:</strong> {confirmModal.data.title}</li>
                 <li><strong>Atas Nama:</strong> {confirmModal.data.atas_nama || "-"}</li>
-                <li><strong>Kategori:</strong> {confirmModal.data.category}</li>
                 <li><strong>Metode:</strong> {confirmModal.data.metode_pembayaran}</li>
                 <li><strong>Tipe:</strong> {confirmModal.data.type}</li>
                 <li><strong>Nominal:</strong> {rupiah.format(confirmModal.data.amount)}</li>
@@ -647,22 +646,6 @@ function DashboardScreen({
         </div>
         <div className="form-grid">
           <label>
-            Kategori
-            <select
-              value={form.category}
-              onChange={(event) =>
-                onFormChange((current) => ({
-                  ...current,
-                  category: event.target.value,
-                }))
-              }
-            >
-              {(formType === "Pemasukan" ? defaultIncomeCategories : defaultExpenseCategories).map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </label>
-          <label>
             Atas Nama
             <input
               value={form.atas_nama}
@@ -675,8 +658,6 @@ function DashboardScreen({
               }
             />
           </label>
-        </div>
-        <div className="form-grid">
           <label>
             Metode Pembayaran
             <select
@@ -693,6 +674,8 @@ function DashboardScreen({
               ))}
             </select>
           </label>
+        </div>
+        <div className="form-grid wide">
           <label>
             Nominal
             <input
@@ -1381,27 +1364,20 @@ function EditTransactionModal({
             <label>Keterangan <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></label>
           </div>
           <div className="form-grid" style={{ marginBottom: '14px' }}>
-            <label>Kategori
-              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                {(form.type === "Pemasukan" ? defaultIncomeCategories : defaultExpenseCategories).map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </label>
             <label>Atas Nama <input value={form.atas_nama} onChange={(e) => setForm({ ...form, atas_nama: e.target.value })} /></label>
-          </div>
-          <div className="form-grid" style={{ marginBottom: '14px' }}>
             <label>Metode
               <select value={form.metode_pembayaran} onChange={(e) => setForm({ ...form, metode_pembayaran: e.target.value })}>
                 {metodeOptions.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </label>
+          </div>
+          <div className="form-grid" style={{ marginBottom: '14px' }}>
             <label>Tipe
               <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as TransactionType, category: e.target.value === "Pemasukan" ? defaultIncomeCategories[0] : defaultExpenseCategories[0] })}>
                 <option value="Pemasukan">Pemasukan</option>
                 <option value="Pengeluaran">Pengeluaran</option>
               </select>
             </label>
-          </div>
-          <div className="form-grid wide">
             <label>Nominal <input inputMode="numeric" value={form.amount ? Number(form.amount).toLocaleString('id-ID') : ''} onChange={(e) => setForm({ ...form, amount: Number(e.target.value.replace(/\D/g, "")) })} required /></label>
           </div>
           <div className="modal-actions" style={{ marginTop: '24px' }}>
