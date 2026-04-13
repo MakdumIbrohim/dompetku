@@ -65,6 +65,15 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   }, []);
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem("dompetku_theme") as "light" | "dark" | null;
+    if (savedTheme) setTheme(savedTheme);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("dompetku_theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
     const userStr = localStorage.getItem("dompetku_user");
     if (!userStr && screen !== "login") {
       router.push("/login");
