@@ -1551,6 +1551,7 @@ function Toast({ message, type, onClose }: { message: string; type: "success" | 
       <div className={`toast-notification ${type}`}>
         <span>{message}</span>
         <button onClick={onClose} type="button" aria-label="Tutup">✕</button>
+        <div className="toast-progress"></div>
       </div>
     </div>
   );
