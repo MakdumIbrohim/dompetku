@@ -498,12 +498,11 @@ function LoginScreen({ showToast, onLogin }: { showToast: (msg: string, type: "s
       <span className="shape shape-coral no-print" />
       <section className="login-panel">
         <div className="login-art">
-          <Image
+          <img
             src="/login-art.png"
             alt="Ilustrasi dompet Dompetku"
-            width={400}
-            height={400}
-            priority
+            style={{ width: '100%', height: 'auto', maxWidth: '380px', objectFit: 'contain' }}
+            className="login-art-image"
           />
         </div>
         <div className="login-content">
