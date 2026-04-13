@@ -875,7 +875,7 @@ function HistoryScreen({
           <p>Histori transaksi</p>
           <span>{filteredTransactions.length} data</span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrapper">
           <table>
             <thead>
               <tr>
@@ -1005,7 +1005,7 @@ function KelolaScreen({
           <p>Kelola Data Transaksi</p>
           <span>{transactions.length} total data</span>
         </div>
-        <div style={{ overflowX: "auto" }}>
+        <div className="table-wrapper">
           <table>
             <thead>
               <tr>
