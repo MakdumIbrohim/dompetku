@@ -7,19 +7,19 @@
   --bg-card:       rgb(255 255 255 / 85%);
   --fg:            #2d2a27;
 
-  /* Sage green (income) */
-  --green:         #059D00;
-  --green-light:   #e6f9e6;
-  --green-shadow:  rgb(5 157 0 / 16%);
+  /* Indigo (income / primary) */
+  --green:         #5156D6;
+  --green-light:   #EEF0FF;
+  --green-shadow:  rgb(81 86 214 / 16%);
 
   /* Blush rose (expense) */
   --rose:          #D60042;
   --rose-light:    #ffeef2;
   --rose-shadow:   rgb(214 0 66 / 14%);
 
-  /* Balance card — deep slate (still soft) */
-  --slate-deep:    #000957;
-  --slate-mid:     #7a8493;
+  /* Balance card — deep indigo */
+  --slate-deep:    #2F338B;
+  --slate-mid:     #5156D6;
 
   /* Decorative shapes */
   --shape-a:       #e8e4dd;
@@ -139,7 +139,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
   opacity: 0.55;
 }
 
-.is-dark .shape-coral { background: #26382f; opacity: 0.42; }
+.is-dark .shape-coral { background: #2c2e5c; opacity: 0.42; }
 .is-dark .shape-gold  { background: #3a2d32; opacity: 0.42; }
 
 /* ─── Sidebar ───────────────────────────────────────── */
@@ -318,7 +318,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 
 .is-dark .info-card-premium {
-  background: rgb(5 157 0 / 10%);
+  background: rgb(81 86 214 / 10%);
   border-color: var(--green);
 }
 
@@ -455,7 +455,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 
 .is-dark .balance-card {
-  background: linear-gradient(135deg, #343d4a 0%, #4a5361 100%);
+  background: linear-gradient(135deg, #24276b 0%, #3a3f9e 100%);
 }
 
 .balance-card p {
@@ -1437,7 +1437,7 @@ select:focus {
 }
 
 .is-dark .detail-balance-card {
-  background: #3d4654;
+  background: #24276b;
 }
 
 .balance-info {
@@ -1607,7 +1607,7 @@ select:focus {
     text-transform: uppercase;
   }
   
-  .type-badge.Pemasukan { color: #1e7e34 !important; border: 1px solid #1e7e34 !important; }
+  .type-badge.Pemasukan { color: #5156D6 !important; border: 1px solid #5156D6 !important; }
   .type-badge.Pengeluaran { color: #dc3545 !important; border: 1px solid #dc3545 !important; }
 }
 
