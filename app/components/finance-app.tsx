@@ -5,20 +5,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../context/ThemeContext";
+import { useData, Transaction } from "../context/DataContext";
 
 type Screen = "login" | "dashboard" | "histori" | "kelola";
 type TransactionType = "Pemasukan" | "Pengeluaran";
 
-type Transaction = {
-  id: string;
-  date: string;
-  title: string;
-  atas_nama: string;
-  type: TransactionType;
-  metode_pembayaran: string;
-  amount: number;
-  created_at: string;
-};
 
 const rupiah = new Intl.NumberFormat("id-ID", {
   style: "currency",
@@ -39,10 +30,15 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   const { theme, toggleTheme } = useTheme();
   const [formType, setFormType] = useState<TransactionType>("Pemasukan");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { 
+    transactions, 
+    isLoading, 
+    isSubmitting, 
+    addTransaction, 
+    deleteTransaction, 
+    updateTransaction 
+  } = useData();
   const [user, setUser] = useState<{ nama_lengkap: string } | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [editData, setEditData] = useState<Transaction | null>(null);
   const [confirmModal, setConfirmModal] = useState<{
@@ -85,35 +81,6 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     }
   }, [screen, router, showToast]);
 
-  useEffect(() => {
-    if (screen === "login") return;
-    
-    setIsLoading(true);
-    fetch(GAS_URL)
-      .then((res) => res.json())
-      .then((res) => {
-        if (res.status === "success") {
-          const mappedData: Transaction[] = res.data.map((item: any) => {
-            return {
-              id: String(item.id_transaksi),
-              date: item.tanggal ? new Date(item.tanggal).toISOString().split("T")[0] : "",
-              title: item.keterangan,
-              atas_nama: item.atas_nama,
-              type: item.jenis as TransactionType,
-              metode_pembayaran: item.metode_pembayaran,
-              amount: Number(item.nominal) || 0,
-              created_at: item.created_at,
-            };
-          }).reverse();
-          setTransactions(mappedData);
-        }
-      })
-      .catch((err) => {
-        console.error("Gagal memuat data dari Spreadsheet:", err);
-        showToast("Gagal memuat data histori dari server.", "error");
-      })
-      .finally(() => setIsLoading(false));
-  }, [screen]);
 
   const totals = useMemo(() => {
     const income = transactions
@@ -143,40 +110,8 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     const data = confirmModal.data;
     setConfirmModal({ isOpen: false, action: null });
 
-    setIsSubmitting(true);
-
-    const payload = {
-      action: "CREATE",
-      tanggal: data.date,
-      keterangan: data.title,
-      atas_nama: data.atas_nama,
-      jenis: data.type,
-      metode_pembayaran: data.metode_pembayaran,
-      nominal: data.amount,
-    };
-
-    try {
-      // Catatan: Google Apps Script memerlukan content-type text/plain agar tidak memicu error CORS preflight.
-      await fetch(GAS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload),
-      });
-
-      setTransactions((items) => [
-        {
-          id: `temp-${Date.now()}`,
-          date: data.date,
-          title: data.title,
-          atas_nama: data.atas_nama,
-          type: data.type,
-          metode_pembayaran: data.metode_pembayaran,
-          amount: data.amount,
-          created_at: new Date().toISOString().replace("T", " ").slice(0, 19),
-        },
-        ...items,
-      ]);
-
+    const success = await addTransaction(data);
+    if (success) {
       setForm({
         date: new Date().toISOString().split("T")[0],
         title: "",
@@ -186,11 +121,8 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         amount: "",
       });
       showToast("Transaksi berhasil disimpan!", "success");
-    } catch (err) {
-      console.error("Gagal menyimpan:", err);
+    } else {
       showToast("Gagal menyimpan transaksi!", "error");
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -205,19 +137,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
   async function executeDelete() {
     const id = confirmModal.data;
     setConfirmModal({ isOpen: false, action: null });
-    const prev = [...transactions];
-    setTransactions((items) => items.filter((i) => i.id !== id));
-
-    try {
-      await fetch(GAS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({ action: "DELETE", id_transaksi: id }),
-      });
+    const success = await deleteTransaction(id);
+    if (success) {
       showToast("Transaksi berhasil dihapus!", "success");
-    } catch (err) {
-      console.error("Gagal menghapus:", err);
-      setTransactions(prev);
+    } else {
       showToast("Gagal menghapus transaksi!", "error");
     }
   }
@@ -227,28 +150,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     setConfirmModal({ isOpen: false, action: null });
     setEditData(null);
     
-    const prev = [...transactions];
-    setTransactions((items) => items.map((i) => i.id === updatedData.id ? updatedData : i));
-
-    try {
-      await fetch(GAS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify({
-          action: "UPDATE",
-          id_transaksi: updatedData.id,
-          tanggal: updatedData.date,
-          keterangan: updatedData.title,
-          atas_nama: updatedData.atas_nama,
-          jenis: updatedData.type,
-          metode_pembayaran: updatedData.metode_pembayaran,
-          nominal: updatedData.amount
-        })
-      });
+    const success = await updateTransaction(updatedData);
+    if (success) {
       showToast("Transaksi berhasil diperbarui!", "success");
-    } catch (err) {
-      console.error("Gagal mengedit:", err);
-      setTransactions(prev);
+    } else {
       showToast("Gagal memperbarui transaksi!", "error");
     }
   }

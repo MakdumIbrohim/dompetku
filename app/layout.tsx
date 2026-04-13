@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "./context/ThemeContext";
+import { DataProvider } from "./context/DataContext";
 
 export default function RootLayout({
   children,
@@ -23,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="id" className={`h-full antialiased ${inter.variable}`}>
       <body className="min-h-full flex flex-col">
-        <ThemeProvider>{children}</ThemeProvider>
+        <DataProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </DataProvider>
       </body>
     </html>
   );
