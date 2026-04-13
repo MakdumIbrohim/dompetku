@@ -1527,7 +1527,7 @@ function DonutChart({ income, expense }: { income: number; expense: number }) {
       </div>
       <div className="legend-list">
         {breakdown.map((item) => (
-          <span key={item.label} style={{ padding: '0 14px', backgroundColor: 'var(--surface)' }}>
+          <span key={item.label}>
             <i style={{ background: item.color }} />
             {item.label}
             <b>{item.value}%</b>
