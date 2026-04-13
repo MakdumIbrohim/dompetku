@@ -499,32 +499,34 @@ function LoginScreen({ showToast, onLogin }: { showToast: (msg: string, type: "s
       <section className="login-panel">
         <div className="login-art">
           <Image
-            src="/wallet-mark.svg"
+            src="/login-art.png"
             alt="Ilustrasi dompet Dompetku"
-            width={168}
-            height={168}
+            width={400}
+            height={400}
             priority
           />
         </div>
-        <div className="login-copy">
-          <p>Catat uang tanpa ribet</p>
-          <h1>Dompetku</h1>
-          <span>Masuk untuk mengatur pemasukan, pengeluaran, dan histori keuangan harian.</span>
+        <div className="login-content">
+          <div className="login-copy">
+            <p>Catat uang tanpa ribet</p>
+            <h1>Dompetku</h1>
+            <span>Masuk untuk mengatur pemasukan, pengeluaran, dan histori keuangan harian.</span>
+          </div>
+          <form className="login-form" onSubmit={handleLogin}>
+            <label>
+              Username
+              <input name="username" placeholder="Masukkan username" type="text" required />
+            </label>
+            <label>
+              Password
+              <input name="password" placeholder="password" type="password" required />
+            </label>
+            <button className={`primary-action ${isLoading ? 'is-loading' : ''}`} type="submit" disabled={isLoading}>
+              {isLoading && <SpinnerIcon />}
+              Masuk
+            </button>
+          </form>
         </div>
-        <form className="login-form" onSubmit={handleLogin}>
-          <label>
-            Username
-            <input name="username" placeholder="Masukkan username" type="text" required />
-          </label>
-          <label>
-            Password
-            <input name="password" placeholder="password" type="password" required />
-          </label>
-          <button className={`primary-action ${isLoading ? 'is-loading' : ''}`} type="submit" disabled={isLoading}>
-            {isLoading && <SpinnerIcon />}
-            Masuk
-          </button>
-        </form>
       </section>
     </main>
   );

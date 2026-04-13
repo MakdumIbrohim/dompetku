@@ -1636,45 +1636,99 @@ select:focus {
   z-index: 1;
   display: grid;
   width: min(960px, 100%);
-  grid-template-columns: 0.9fr 1fr;
-  gap: 30px;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 40px;
   align-items: center;
-  padding: 34px;
-  background: rgb(255 255 255 / 70%);
-  backdrop-filter: blur(18px);
-  border-radius: 24px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(32px);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.1);
+}
+
+.login-content {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
 .login-art {
   display: grid;
-  min-height: 360px;
+  min-height: 440px;
   place-items: center;
-  border-radius: 18px;
+  border-radius: 24px;
   background: linear-gradient(
-    145deg,
-    var(--green-light) 0%,
-    #f6f4f0 60%,
-    #f3eee8 100%
+    135deg,
+    #ffffff 0%,
+    var(--green-light) 100%
   );
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.5);
+}
+
+.login-art img {
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.08));
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+.login-copy p {
+  color: var(--green);
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
 }
 
 .login-copy h1 {
   margin: 0;
-  font-size: 50px;
-  line-height: 1;
-  font-weight: 900;
+  font-size: 56px;
+  line-height: 0.9;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  color: var(--slate-deep);
 }
 
 .login-copy span {
   display: block;
-  max-width: 440px;
-  margin: 14px 0 22px;
+  max-width: 380px;
+  margin: 18px 0 0;
   color: var(--muted);
-  font-weight: 600;
-  line-height: 1.6;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-.login-form { display: grid; gap: 14px; }
+.login-form { 
+  display: grid; 
+  gap: 16px;
+}
+
+.login-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.login-form input {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.login-form input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px var(--green-shadow);
+}
 
 /* ─── Responsive · ≤1040px ──────────────────────────── */
 @media screen and (max-width: 1040px) {
