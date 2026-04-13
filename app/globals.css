@@ -1177,6 +1177,11 @@ select:focus {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+
+  /* Reset Grid agar tidak ada kolom kosong saat sidebar disembunyikan */
+  .web-shell, .dashboard-grid {
+    display: block !important;
+  }
   
   .sidebar,
   .workspace-header,
@@ -1208,17 +1213,17 @@ select:focus {
     display: flex !important;
     align-items: flex-end;
     justify-content: space-between;
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid #000;
     padding-bottom: 15px;
     margin-bottom: 30px;
   }
   
   .report-info h1 { margin: 0; font-size: 22px; font-weight: 800; color: #000; }
-  .report-info p { margin: 4px 0 0; font-size: 13px; color: #666; }
+  .report-info p { margin: 4px 0 0; font-size: 13px; color: #000; }
   
   .report-meta { text-align: right; line-height: 1.4; }
   .report-meta strong { font-size: 14px; color: #000; }
-  .report-meta span { font-size: 12px; color: #666; }
+  .report-meta span { font-size: 12px; color: #000; }
 
   /* Compact Summary & Metrics */
   .history-summary { 
@@ -1226,13 +1231,13 @@ select:focus {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 25px !important; 
-    border: 1px solid #eee;
+    border: 1px solid #000;
     padding: 20px !important;
     border-radius: 12px;
   }
   
   .history-summary div p { margin-bottom: 4px; font-size: 13px; }
-  .history-summary div strong { font-size: 24px; color: var(--green); }
+  .history-summary div strong { font-size: 24px; color: #000; }
 
   .history-metrics { 
     display: grid !important;
@@ -1242,13 +1247,13 @@ select:focus {
   }
   
   .history-metrics article { 
-    border: 1px solid #eee !important; 
+    border: 1px solid #000 !important; 
     padding: 12px !important;
     border-radius: 8px;
     text-align: center;
   }
   
-  .history-metrics article span { font-size: 11px; color: #666; }
+  .history-metrics article span { font-size: 11px; color: #000; }
   .history-metrics article strong { font-size: 16px; margin-top: 4px; display: block; }
 
   /* Compact Chart */
@@ -1265,14 +1270,20 @@ select:focus {
     margin-top: 0 !important;
     border: none !important;
     box-shadow: none !important;
+    padding: 0 !important;
+  }
+  
+  .history-table table {
+    /* Mencegah tabel memaksakan lebar dan terpotong di kertas portrait */
+    min-width: auto !important; 
   }
   
   .history-table .section-title { margin-bottom: 10px !important; }
   .history-table .section-title p { font-size: 16px; font-weight: 700; }
 
-  table { width: 100%; border-collapse: collapse; border: 1px solid #ccc; }
-  table th { background: #f8f9fa !important; color: #333 !important; font-weight: 700; border: 1px solid #ccc !important; }
-  table td { border: 1px solid #ccc !important; font-size: 10px !important; padding: 10px !important; }
+  table { width: 100%; border-collapse: collapse; border: 1px solid #000; }
+  table th { background: transparent !important; color: #000 !important; font-weight: 700; border: 1px solid #000 !important; padding: 6px 4px !important; font-size: 10px !important; }
+  table td { border: 1px solid #000 !important; font-size: 10px !important; padding: 6px 4px !important; }
   
   .type-badge { 
     border-radius: 4px !important;
@@ -1339,7 +1350,7 @@ select:focus {
 .login-form { display: grid; gap: 14px; }
 
 /* ─── Responsive · ≤1040px ──────────────────────────── */
-@media (max-width: 1040px) {
+@media screen and (max-width: 1040px) {
   .web-shell { display: block; }
 
   .menu-button {
@@ -1437,7 +1448,7 @@ select:focus {
 }
 
 /* ─── Responsive · ≤720px ───────────────────────────── */
-@media (max-width: 720px) {
+@media screen and (max-width: 720px) {
   .sidebar { width: min(260px, 82vw); gap: 22px; padding: 24px 16px; }
   .brand { display: flex; justify-content: flex-start; gap: 12px; text-align: left; }
   .brand img { width: 44px; height: 44px; }
@@ -1465,7 +1476,7 @@ select:focus {
 }
 
 /* ─── Responsive · ≤390px ───────────────────────────── */
-@media (max-width: 390px) {
+@media screen and (max-width: 390px) {
   .sidebar { width: min(250px, 86vw); gap: 18px; padding: 22px 14px; }
   .brand small { display: none; }
   .sidebar nav { gap: 4px; }
