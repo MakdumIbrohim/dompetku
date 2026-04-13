@@ -1189,6 +1189,10 @@ select:focus {
   animation: toast-slide-down 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
+.toast-notification.is-exiting {
+  animation: toast-slide-up 0.35s cubic-bezier(0.47, 0, 0.745, 0.715) forwards;
+}
+
 .is-dark .toast-notification {
   background: rgb(35 36 45 / 85%);
   border-color: rgb(255 255 255 / 10%);
@@ -1209,6 +1213,11 @@ select:focus {
 @keyframes toast-slide-down {
   from { transform: translateY(-100%); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toast-slide-up {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-120%); opacity: 0; }
 }
 
 .toast-progress {

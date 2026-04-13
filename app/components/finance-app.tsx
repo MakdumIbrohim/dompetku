@@ -1541,14 +1541,22 @@ function DonutChart({ income, expense }: { income: number; expense: number }) {
 
 
 function Toast({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) {
+  const [isExiting, setIsExiting] = useState(false);
+
   useEffect(() => {
-    const timer = setTimeout(onClose, 3500);
-    return () => clearTimeout(timer);
+    // Start exit animation 300ms before closing
+    const exitTimer = setTimeout(() => setIsExiting(true), 3200);
+    const closeTimer = setTimeout(onClose, 3500);
+    
+    return () => {
+      clearTimeout(exitTimer);
+      clearTimeout(closeTimer);
+    };
   }, [onClose]);
 
   return (
     <div className="toast-wrapper">
-      <div className={`toast-notification ${type}`}>
+      <div className={`toast-notification ${type} ${isExiting ? 'is-exiting' : ''}`}>
         <span>{message}</span>
         <button onClick={onClose} type="button" aria-label="Tutup">✕</button>
         <div className="toast-progress"></div>
