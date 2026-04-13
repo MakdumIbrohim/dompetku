@@ -106,10 +106,9 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
 
   async function executeSubmit() {
     const data = confirmModal.data;
-    setConfirmModal({ isOpen: false, action: null });
-
     const success = await addTransaction(data);
     if (success) {
+      setConfirmModal({ isOpen: false, action: null });
       setForm({
         date: new Date().toISOString().split("T")[0],
         title: "",
@@ -134,9 +133,9 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
 
   async function executeDelete() {
     const id = confirmModal.data;
-    setConfirmModal({ isOpen: false, action: null });
     const success = await deleteTransaction(id);
     if (success) {
+      setConfirmModal({ isOpen: false, action: null });
       showToast("Transaksi berhasil dihapus!", "success");
     } else {
       showToast("Gagal menghapus transaksi!", "error");
@@ -145,11 +144,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
 
   async function executeEdit() {
     const updatedData: Transaction = confirmModal.data;
-    setConfirmModal({ isOpen: false, action: null });
-    setEditData(null);
-    
     const success = await updateTransaction(updatedData);
     if (success) {
+      setConfirmModal({ isOpen: false, action: null });
+      setEditData(null);
       showToast("Transaksi berhasil diperbarui!", "success");
     } else {
       showToast("Gagal memperbarui transaksi!", "error");
