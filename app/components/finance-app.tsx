@@ -179,16 +179,6 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     >
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       <button
-        className="menu-button no-print"
-        type="button"
-        aria-label="Buka sidebar"
-        onClick={() => setSidebarOpen(true)}
-      >
-        <span />
-        <span />
-        <span />
-      </button>
-      <button
         className="sidebar-backdrop"
         type="button"
         aria-label="Tutup sidebar"
@@ -252,6 +242,16 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         <span className="shape shape-coral no-print" />
         <span className="shape shape-gold no-print" />
         <header className="workspace-header">
+          <button
+            className="menu-button no-print"
+            type="button"
+            aria-label="Buka sidebar"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
           <div>
             <p>Management Keuangan</p>
             <h1>
@@ -280,7 +280,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
               onClick={logout}
             >
               <LogOutIcon />
-              Logout
+              <span>Logout</span>
             </button>
           </div>
         </header>

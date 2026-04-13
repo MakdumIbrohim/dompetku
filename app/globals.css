@@ -1476,24 +1476,26 @@ select:focus {
 
   .menu-button {
     position: absolute;
-    top: 14px;
-    left: 14px;
-    z-index: 12;
+    top: 50%;
+    left: 18px;
+    transform: translateY(-50%);
+    z-index: 10;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    width: 44px;
-    height: 44px;
+    gap: 4px;
+    width: 38px;
+    height: 38px;
     align-items: center;
     justify-content: center;
     border: 0;
-    border-radius: 12px;
+    border-radius: 10px;
     background: var(--green);
-    box-shadow: 0 6px 18px var(--green-shadow);
+    box-shadow: 0 4px 10px var(--green-shadow);
     cursor: pointer;
+    transition: all 180ms ease;
   }
 
-  .sidebar-open .menu-button { display: none; }
+  .sidebar-open .menu-button { opacity: 0; pointer-events: none; }
 
   .menu-button span {
     display: block;
@@ -1558,7 +1560,7 @@ select:focus {
     white-space: nowrap;
   }
 
-  .workspace { margin-left: 0; padding: 76px 22px 22px; }
+  .workspace { margin-left: 0; padding: 20px; }
 
   .dashboard-grid,
   .chart-card,
@@ -1578,16 +1580,48 @@ select:focus {
 
   .sidebar nav a { padding: 13px 14px; font-size: 13px; text-align: left; white-space: nowrap; }
 
-  .workspace { margin-left: 0; padding: 74px 12px 18px; }
+  .workspace { margin-left: 0; padding: 18px; }
 
-  .workspace-header,
-  .section-title { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .workspace-header { 
+    margin: -18px -18px 22px -18px; 
+    padding: 10px 18px 10px 60px; /* Space for menu button on the left */
+    flex-direction: row; 
+    align-items: center; 
+    gap: 10px;
+    height: 64px;
+  }
 
-  .workspace-header { padding-right: 0; }
+  .workspace-header > div:first-child {
+    flex: 1;
+    min-width: 0;
+  }
 
-  .theme-button, .logout-button { height: 42px; }
-  .theme-button { width: 42px; }
-  .workspace-header h1 { font-size: 28px; }
+  .workspace-header p { 
+    font-size: 9px; 
+    margin-bottom: 2px;
+  }
+
+  .workspace-header h1 { 
+    font-size: 18px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .theme-button, .logout-button { 
+    height: 38px; 
+    font-size: 12px;
+  }
+  
+  .theme-button { width: 38px; flex-shrink: 0; }
+  .logout-button { padding: 0 12px; flex-shrink: 0; }
+  .logout-button span { display: none; } /* Hide text "Logout" on very small mobile if needed, but we keep it small for now */
 
   .form-grid,
   .form-grid.wide,
