@@ -243,10 +243,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         <span className="shape shape-gold no-print" />
         <header className="workspace-header">
           <button
-            className="menu-button no-print"
+            className={`menu-button no-print ${sidebarOpen ? "is-active" : ""}`}
             type="button"
-            aria-label="Buka sidebar"
-            onClick={() => setSidebarOpen(true)}
+            aria-label={sidebarOpen ? "Tutup sidebar" : "Buka sidebar"}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             <span />
             <span />
