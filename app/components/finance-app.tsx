@@ -1060,7 +1060,7 @@ function TransactionRow({ item }: { item: Transaction }) {
       <div>
         <strong>{item.title}</strong>
         <span>
-          {item.category} • {item.atas_nama || "-"} • {formatDate(item.date)}
+          {item.atas_nama || "-"} • {formatDate(item.date)}
         </span>
       </div>
       <b>

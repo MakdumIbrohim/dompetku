@@ -32,7 +32,7 @@ export const defaultIncomeCategories = [
   "Bonus",
   "Investasi",
   "Penjualan",
-  "Lain-lain Pemasukan",
+  "Pemasukan",
 ];
 
 export const defaultExpenseCategories = [
@@ -44,7 +44,7 @@ export const defaultExpenseCategories = [
   "Kesehatan",
   "Pendidikan",
   "Cicilan/Utang",
-  "Lain-lain Pengeluaran",
+  "Pengeluaran",
 ];
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -74,7 +74,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
           })() : "",
           title: item.keterangan,
-          category: item.kategori || (item.jenis === "Pemasukan" ? "Lain-lain Pemasukan" : "Lain-lain Pengeluaran"),
+          category: item.kategori || (item.jenis === "Pemasukan" ? "Pemasukan" : "Pengeluaran"),
           atas_nama: item.atas_nama,
           type: item.jenis as TransactionType,
           metode_pembayaran: item.metode_pembayaran,
