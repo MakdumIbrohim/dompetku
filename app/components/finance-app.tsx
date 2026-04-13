@@ -245,7 +245,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
         </ConfirmModal>
       )}
 
-      <Sidebar screen={screen} onNavigate={() => setSidebarOpen(false)} />
+      <Sidebar 
+        screen={screen} 
+        onNavigate={() => setSidebarOpen(false)} 
+      />
       <section className="workspace">
         <span className="shape shape-cyan no-print" />
         <span className="shape shape-coral no-print" />
@@ -255,7 +258,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             <p>Management Keuangan</p>
             <h1>
               {screen === "dashboard" 
-                ? `Halo, ${user?.nama_lengkap || "Pengguna"}! (${user?.username || "..."})` 
+                ? `Halo, ${user?.nama_lengkap || "Pengguna"}.` 
                 : screen === "histori" 
                 ? "Histori Transaksi" 
                 : "Kelola Data"}
@@ -274,7 +277,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
               {theme === "light" ? <MoonIcon /> : <SunIcon />}
             </button>
             <button
-              className="logout-button"
+              className="logout-button navbar-logout"
               type="button"
               onClick={logout}
             >

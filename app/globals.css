@@ -224,13 +224,23 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 
 .workspace-header {
-  position: relative;
-  z-index: 1;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 28px;
+  margin: -34px -34px 28px -34px; /* Pull out of workspace padding */
+  padding: 16px 34px;
+  background: rgb(255 255 255 / 75%);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: all 200ms ease;
+}
+
+.is-dark .workspace-header {
+  background: rgb(15 16 22 / 75%);
 }
 
 .workspace-header p,
@@ -260,30 +270,33 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 
 .logout-button {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  height: 46px !important;
-  padding: 0 16px !important;
-  border: 0 !important;
-  border-radius: 12px !important;
-  background: var(--rose) !important;
-  color: #fff !important;
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  box-shadow: 0 4px 12px var(--rose-shadow) !important;
-  transition: all 160ms ease !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--rose);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px var(--rose-shadow);
+  transition: all 160ms ease;
 }
 
-.logout-button:hover {
-  filter: brightness(1.1) !important;
-  box-shadow: 0 6px 16px var(--rose-shadow) !important;
+.navbar-logout {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  gap: 6px;
+  font-size: 13px;
 }
 
-.logout-button svg {
-  width: 16px;
-  height: 16px;
+.navbar-logout svg {
+  width: 14px;
+  height: 14px;
 }
 
 /* ─── Info Card & Export Button ─────────────────────── */
