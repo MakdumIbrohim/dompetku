@@ -48,7 +48,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       if (data.status === "success") {
         const mappedData: Transaction[] = data.data.map((item: any) => ({
           id: String(item.id_transaksi),
-          date: item.tanggal ? new Date(item.tanggal).toISOString().split("T")[0] : "",
+          date: item.tanggal ? (() => {
+            const d = new Date(item.tanggal);
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          })() : "",
           title: item.keterangan,
           atas_nama: item.atas_nama,
           type: item.jenis as TransactionType,

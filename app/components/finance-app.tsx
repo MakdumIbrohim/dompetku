@@ -48,7 +48,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     data?: any;
   }>({ isOpen: false, action: null });
   const [form, setForm] = useState({
-    date: new Date().toISOString().split("T")[0],
+    date: (() => {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    })(),
     title: "",
     atas_nama: "",
     type: "Pemasukan" as TransactionType,
@@ -110,7 +113,10 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     if (success) {
       setConfirmModal({ isOpen: false, action: null });
       setForm({
-        date: new Date().toISOString().split("T")[0],
+        date: (() => {
+          const d = new Date();
+          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        })(),
         title: "",
         atas_nama: user?.nama_lengkap || "",
         type: formType,
