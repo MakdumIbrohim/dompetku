@@ -33,6 +33,9 @@
   --border:        rgb(63 58 54 / 7%);
 }
 
+.income-text { color: var(--green); }
+.expense-text { color: var(--rose); }
+
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--fg);
@@ -1289,6 +1292,196 @@ select:focus {
 .print-only,
 .report-header-print {
   display: none;
+}
+
+/* ─── Transaction Detail Modal ─────────────────────── */
+.detail-modal {
+  max-width: 480px !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-type-badge .badge {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.detail-type-badge .badge.Pemasukan {
+  background: var(--green-light);
+  color: var(--green);
+}
+
+.detail-type-badge .badge.Pengeluaran {
+  background: var(--rose-light);
+  color: var(--rose);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-amount-section {
+  padding: 24px 20px;
+  text-align: center;
+  background: var(--bg-card);
+}
+
+.detail-amount-section .label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.detail-amount-section h2 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.detail-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+.info-item {
+  display: flex;
+  gap: 12px;
+}
+
+.info-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.info-content span {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.info-content p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.detail-description {
+  padding: 0 20px 20px;
+}
+
+.detail-description span {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.detail-description p {
+  margin: 0;
+  font-size: 14px;
+  background: var(--bg);
+  padding: 12px;
+  border-radius: 12px;
+  color: var(--fg);
+}
+
+.detail-balance-card {
+  margin: 0 20px 20px;
+  padding: 18px;
+  background: var(--slate-deep);
+  color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px var(--border);
+}
+
+.is-dark .detail-balance-card {
+  background: #3d4654;
+}
+
+.balance-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.balance-step {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.balance-step span {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+}
+
+.balance-step strong {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.balance-arrow {
+  font-size: 20px;
+  opacity: 0.5;
+}
+
+.balance-footer {
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.detail-modal .modal-actions {
+  padding: 0 20px 20px;
 }
 
 @media print {

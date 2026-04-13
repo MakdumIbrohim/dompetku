@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../context/ThemeContext";
-import { useData, Transaction } from "../context/DataContext";
+import { useData, Transaction, defaultIncomeCategories, defaultExpenseCategories } from "../context/DataContext";
 import { useAuth } from "../context/AuthContext";
 
 type Screen = "login" | "dashboard" | "histori" | "kelola";
@@ -53,6 +53,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     })(),
     title: "",
+    category: defaultIncomeCategories[0],
     atas_nama: "",
     type: "Pemasukan" as TransactionType,
     metode_pembayaran: "Tunai",
@@ -118,6 +119,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
           return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         })(),
         title: "",
+        category: formType === "Pemasukan" ? defaultIncomeCategories[0] : defaultExpenseCategories[0],
         atas_nama: user?.nama_lengkap || "",
         type: formType,
         metode_pembayaran: "Tunai",
@@ -165,6 +167,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     setForm((current) => ({
       ...current,
       type: nextType,
+      category: nextType === "Pemasukan" ? defaultIncomeCategories[0] : defaultExpenseCategories[0],
     }));
   }
 
@@ -230,6 +233,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
                 <li><strong>Tanggal:</strong> {formatDate(confirmModal.data.date)}</li>
                 <li><strong>Keterangan:</strong> {confirmModal.data.title}</li>
                 <li><strong>Atas Nama:</strong> {confirmModal.data.atas_nama || "-"}</li>
+                <li><strong>Kategori:</strong> {confirmModal.data.category}</li>
                 <li><strong>Metode:</strong> {confirmModal.data.metode_pembayaran}</li>
                 <li><strong>Tipe:</strong> {confirmModal.data.type}</li>
                 <li><strong>Nominal:</strong> {rupiah.format(confirmModal.data.amount)}</li>
@@ -378,6 +382,45 @@ function EditIcon() {
   );
 }
 
+function CalendarIcon() {
+  return (
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+  );
+}
+
+function TagIcon() {
+  return (
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+      <line x1="7" y1="7" x2="7.01" y2="7"></line>
+    </svg>
+  );
+}
+
+function WalletIcon() {
+  return (
+    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+      <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+      <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"></path>
+    </svg>
+  );
+}
+
 function Sidebar({
   screen,
   onNavigate,
@@ -499,7 +542,7 @@ function DashboardScreen({
   isSubmitting,
   isLoading,
 }: {
-  form: { date: string; title: string; atas_nama: string; type: TransactionType; metode_pembayaran: string; amount: string };
+  form: { date: string; title: string; category: string; atas_nama: string; type: TransactionType; metode_pembayaran: string; amount: string };
   formType: TransactionType;
   totals: { income: number; expense: number; balance: number };
   transactions: Transaction[];
@@ -507,6 +550,7 @@ function DashboardScreen({
     React.SetStateAction<{
       date: string;
       title: string;
+      category: string;
       atas_nama: string;
       type: TransactionType;
       metode_pembayaran: string;
@@ -603,6 +647,22 @@ function DashboardScreen({
         </div>
         <div className="form-grid">
           <label>
+            Kategori
+            <select
+              value={form.category}
+              onChange={(event) =>
+                onFormChange((current) => ({
+                  ...current,
+                  category: event.target.value,
+                }))
+              }
+            >
+              {(formType === "Pemasukan" ? defaultIncomeCategories : defaultExpenseCategories).map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </label>
+          <label>
             Atas Nama
             <input
               value={form.atas_nama}
@@ -615,6 +675,8 @@ function DashboardScreen({
               }
             />
           </label>
+        </div>
+        <div className="form-grid">
           <label>
             Metode Pembayaran
             <select
@@ -631,8 +693,6 @@ function DashboardScreen({
               ))}
             </select>
           </label>
-        </div>
-        <div className="form-grid wide">
           <label>
             Nominal
             <input
@@ -714,6 +774,8 @@ function HistoryScreen({
   const [filterDate, setFilterDate] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<(Transaction & { balanceBefore: number; balanceAfter: number }) | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -756,15 +818,44 @@ function HistoryScreen({
     return dates;
   }, [mounted, filterYear, filterMonth]);
 
+  // Kalkulasi riwayat saldo (running balance)
+  const transactionsWithBalance = useMemo(() => {
+    const reversed = [...transactions].reverse();
+    let currentBalance = 0;
+    const withBalance = reversed.map((t) => {
+      const before = currentBalance;
+      if (t.type === "Pemasukan") {
+        currentBalance += t.amount;
+      } else {
+        currentBalance -= t.amount;
+      }
+      return {
+        ...t,
+        balanceBefore: before,
+        balanceAfter: currentBalance,
+      };
+    });
+    return withBalance.reverse();
+  }, [transactions]);
+
   const filteredTransactions = useMemo(() => {
-    return transactions.filter((t) => {
+    return transactionsWithBalance.filter((t) => {
       if (!t.date) return filterYear === "all";
       if (filterYear !== "all" && !t.date.startsWith(filterYear)) return false;
       if (filterMonth !== "all" && !t.date.startsWith(`${filterYear}-${filterMonth}`)) return false;
       if (filterDate !== "all" && t.date !== `${filterYear}-${filterMonth}-${filterDate}`) return false;
+
+      if (searchQuery.trim() !== "") {
+        const lowerQuery = searchQuery.toLowerCase();
+        const matchTitle = t.title.toLowerCase().includes(lowerQuery);
+        const matchAtasNama = (t.atas_nama || "").toLowerCase().includes(lowerQuery);
+        const matchMetode = t.metode_pembayaran.toLowerCase().includes(lowerQuery);
+        const matchCategory = (t.category || "").toLowerCase().includes(lowerQuery);
+        if (!matchTitle && !matchAtasNama && !matchMetode && !matchCategory) return false;
+      }
       return true;
     });
-  }, [transactions, filterYear, filterMonth, filterDate]);
+  }, [transactionsWithBalance, filterYear, filterMonth, filterDate, searchQuery]);
 
   const filteredTotals = useMemo(() => {
     const income = filteredTransactions
@@ -804,7 +895,7 @@ function HistoryScreen({
         title="Laporan Histori Transaksi" 
         period={`${filterYear !== 'all' ? filterYear : 'Semua Tahun'}${filterMonth !== 'all' ? ' - ' + getMonthName(filterMonth) : ''}${filterDate !== 'all' ? ' - ' + filterDate : ''}`}
       />
-      {isExportModalOpen && (
+      {isExportModalOpen ? (
         <ExportModal 
           onClose={() => setIsExportModalOpen(false)} 
           onExport={() => {
@@ -812,7 +903,12 @@ function HistoryScreen({
             window.print();
           }} 
         />
-      )}
+      ) : selectedItem ? (
+        <TransactionDetailModal 
+          item={selectedItem} 
+          onClose={() => setSelectedItem(null)} 
+        />
+      ) : null}
       <div className="section-title no-print" style={{ marginBottom: "8px" }}>
         <p>Filter Periode Waktu</p>
         <button className="export-btn no-print" onClick={() => setIsExportModalOpen(true)}>
@@ -820,7 +916,14 @@ function HistoryScreen({
           Export PDF
         </button>
       </div>
-      <div className="history-filters">
+      <div className="history-filters" style={{ flexWrap: 'wrap' }}>
+        <input
+          type="search"
+          placeholder="Cari transaksi..."
+          value={searchQuery}
+          onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+          style={{ flexGrow: 1, minWidth: '200px', padding: '10px 14px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--surface)', color: 'inherit' }}
+        />
         <select value={filterYear} onChange={handleYearChange} aria-label="Filter Tahun">
           <option value="all">Semua Tahun</option>
           {availableYears.map((y) => <option key={y} value={y}>{y}</option>)}
@@ -905,28 +1008,33 @@ function HistoryScreen({
               <tr>
                 <th>Tanggal</th>
                 <th>Keterangan</th>
+                <th>Kategori</th>
                 <th>Atas Nama</th>
                 <th>Metode</th>
                 <th>Tipe</th>
-                <th>Nominal</th>
+                <th style={{ textAlign: "right" }}>Nominal</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <>
-                  <TableRowSkeleton columns={6} />
-                  <TableRowSkeleton columns={6} />
-                  <TableRowSkeleton columns={6} />
-                  <TableRowSkeleton columns={6} />
-                  <TableRowSkeleton columns={6} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
                 </>
               ) : currentTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada histori transaksi.</td>
+                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada histori transaksi.</td>
                 </tr>
               ) : (
                 currentTransactions.map((item) => (
-                  <HistoryRow item={item} key={item.id} />
+                  <HistoryRow 
+                    item={item as any} 
+                    key={item.id} 
+                    onClick={() => setSelectedItem(item as any)}
+                  />
                 ))
               )}
             </tbody>
@@ -970,7 +1078,7 @@ function TransactionRow({ item }: { item: Transaction }) {
       <div>
         <strong>{item.title}</strong>
         <span>
-          {item.atas_nama} - {item.metode_pembayaran} - {formatDate(item.date)}
+          {item.category} • {item.atas_nama || "-"} • {formatDate(item.date)}
         </span>
       </div>
       <b>
@@ -981,13 +1089,20 @@ function TransactionRow({ item }: { item: Transaction }) {
   );
 }
 
-function HistoryRow({ item }: { item: Transaction }) {
+function HistoryRow({ 
+  item,
+  onClick
+}: { 
+  item: Transaction & { balanceBefore?: number; balanceAfter?: number };
+  onClick?: () => void;
+}) {
   return (
-    <tr className={`history-row ${item.type}`}>
+    <tr className={`history-row ${item.type}`} onClick={onClick} style={{ cursor: onClick ? "pointer" : "default" }}>
       <td style={{ whiteSpace: "nowrap" }}>{formatDate(item.date)}</td>
       <td>
         <strong>{item.title}</strong>
       </td>
+      <td>{item.category}</td>
       <td>{item.atas_nama}</td>
       <td>{item.metode_pembayaran}</td>
       <td>
@@ -995,7 +1110,7 @@ function HistoryRow({ item }: { item: Transaction }) {
           {item.type === "Pemasukan" ? "Pemasukan" : "Pengeluaran"}
         </span>
       </td>
-      <td style={{ whiteSpace: "nowrap" }}>
+      <td style={{ whiteSpace: "nowrap", textAlign: "right" }}>
         <b>
           {item.type === "Pemasukan" ? "+" : "-"}
           {rupiah.format(item.amount)}
@@ -1017,17 +1132,41 @@ function KelolaScreen({
   onEdit: (item: Transaction) => void;
 }) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
 
-  const totalPages = Math.ceil(transactions.length / itemsPerPage);
-  const currentTransactions = transactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((t) => {
+      if (searchQuery.trim() !== "") {
+        const lowerQuery = searchQuery.toLowerCase();
+        const matchTitle = t.title.toLowerCase().includes(lowerQuery);
+        const matchAtasNama = (t.atas_nama || "").toLowerCase().includes(lowerQuery);
+        const matchMetode = t.metode_pembayaran.toLowerCase().includes(lowerQuery);
+        const matchCategory = (t.category || "").toLowerCase().includes(lowerQuery);
+        if (!matchTitle && !matchAtasNama && !matchMetode && !matchCategory) return false;
+      }
+      return true;
+    });
+  }, [transactions, searchQuery]);
+
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const currentTransactions = filteredTransactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="history-layout">
       <section className="history-table">
-        <div className="section-title">
+        <div className="section-title" style={{ flexWrap: 'wrap', gap: '12px' }}>
           <p>Kelola Data Transaksi</p>
-          <span>{transactions.length} total data</span>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <input
+              type="search"
+              placeholder="Cari data..."
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              style={{ width: '250px', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface)', color: 'inherit', fontSize: '14px' }}
+            />
+            <span>{filteredTransactions.length} total data</span>
+          </div>
         </div>
         <div className="table-wrapper">
           <table>
@@ -1035,6 +1174,7 @@ function KelolaScreen({
               <tr>
                 <th>Tanggal</th>
                 <th>Keterangan</th>
+                <th>Kategori</th>
                 <th>Atas Nama</th>
                 <th>Metode</th>
                 <th>Tipe</th>
@@ -1045,15 +1185,15 @@ function KelolaScreen({
             <tbody>
               {isLoading ? (
                 <>
-                  <TableRowSkeleton columns={7} />
-                  <TableRowSkeleton columns={7} />
-                  <TableRowSkeleton columns={7} />
-                  <TableRowSkeleton columns={7} />
-                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={8} />
+                  <TableRowSkeleton columns={8} />
+                  <TableRowSkeleton columns={8} />
+                  <TableRowSkeleton columns={8} />
+                  <TableRowSkeleton columns={8} />
                 </>
               ) : currentTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada data untuk dikelola.</td>
+                  <td colSpan={8} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada data untuk dikelola.</td>
                 </tr>
               ) : (
                 currentTransactions.map((item) => (
@@ -1155,6 +1295,7 @@ function KelolaRow({ item, onDelete, onEdit }: { item: Transaction; onDelete: (i
     <tr className={`history-row ${item.type}`}>
       <td style={{ whiteSpace: "nowrap" }}>{formatDate(item.date)}</td>
       <td><strong>{item.title}</strong></td>
+      <td>{item.category}</td>
       <td>{item.atas_nama}</td>
       <td>{item.metode_pembayaran}</td>
       <td>
@@ -1240,20 +1381,27 @@ function EditTransactionModal({
             <label>Keterangan <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></label>
           </div>
           <div className="form-grid" style={{ marginBottom: '14px' }}>
+            <label>Kategori
+              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+                {(form.type === "Pemasukan" ? defaultIncomeCategories : defaultExpenseCategories).map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
             <label>Atas Nama <input value={form.atas_nama} onChange={(e) => setForm({ ...form, atas_nama: e.target.value })} /></label>
+          </div>
+          <div className="form-grid" style={{ marginBottom: '14px' }}>
             <label>Metode
               <select value={form.metode_pembayaran} onChange={(e) => setForm({ ...form, metode_pembayaran: e.target.value })}>
                 {metodeOptions.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </label>
-          </div>
-          <div className="form-grid">
             <label>Tipe
-              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as TransactionType })}>
+              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as TransactionType, category: e.target.value === "Pemasukan" ? defaultIncomeCategories[0] : defaultExpenseCategories[0] })}>
                 <option value="Pemasukan">Pemasukan</option>
                 <option value="Pengeluaran">Pengeluaran</option>
               </select>
             </label>
+          </div>
+          <div className="form-grid wide">
             <label>Nominal <input inputMode="numeric" value={form.amount ? Number(form.amount).toLocaleString('id-ID') : ''} onChange={(e) => setForm({ ...form, amount: Number(e.target.value.replace(/\D/g, "")) })} required /></label>
           </div>
           <div className="modal-actions" style={{ marginTop: '24px' }}>
@@ -1264,6 +1412,95 @@ function EditTransactionModal({
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+function TransactionDetailModal({
+  item,
+  onClose,
+}: {
+  item: Transaction & { balanceBefore: number; balanceAfter: number };
+  onClose: () => void;
+}) {
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-content detail-modal" onClick={(e) => e.stopPropagation()}>
+        <header className="detail-header">
+          <div className="detail-type-badge">
+            <span className={`badge ${item.type}`}>{item.type}</span>
+          </div>
+          <button className="close-btn" onClick={onClose} aria-label="Tutup">×</button>
+        </header>
+        
+        <div className="detail-amount-section">
+          <span className="label">Nominal Transaksi</span>
+          <h2 className={item.type === "Pemasukan" ? "income-text" : "expense-text"}>
+            {item.type === "Pemasukan" ? "+" : "-"} {rupiah.format(item.amount)}
+          </h2>
+        </div>
+
+        <div className="detail-info-grid">
+          <div className="info-item">
+            <div className="info-icon"><CalendarIcon /></div>
+            <div className="info-content">
+              <span>Tanggal</span>
+              <p>{formatDate(item.date)}</p>
+            </div>
+          </div>
+          <div className="info-item">
+            <div className="info-icon"><TagIcon /></div>
+            <div className="info-content">
+              <span>Kategori</span>
+              <p>{item.category}</p>
+            </div>
+          </div>
+          <div className="info-item">
+            <div className="info-icon"><UserIcon /></div>
+            <div className="info-content">
+              <span>Pihak Terkait (Atas Nama)</span>
+              <p>{item.atas_nama || "-"}</p>
+            </div>
+          </div>
+          <div className="info-item">
+            <div className="info-icon"><WalletIcon /></div>
+            <div className="info-content">
+              <span>Metode Pembayaran</span>
+              <p>{item.metode_pembayaran}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="detail-description">
+          <span>Keterangan</span>
+          <p>{item.title}</p>
+        </div>
+
+        <div className="detail-balance-card">
+          <div className="balance-info">
+            <div className="balance-step">
+              <span>Saldo Sebelum</span>
+              <strong>{rupiah.format(item.balanceBefore)}</strong>
+            </div>
+            <div className="balance-arrow">→</div>
+            <div className="balance-step">
+              <span>Saldo Sesudah</span>
+              <strong className={item.type === "Pemasukan" ? "income-text" : "expense-text"}>
+                {rupiah.format(item.balanceAfter)}
+              </strong>
+            </div>
+          </div>
+          <div className="balance-footer">
+            <span>Selisih: {rupiah.format(item.amount)}</span>
+          </div>
+        </div>
+
+        <div className="modal-actions" style={{ marginTop: '24px' }}>
+          <button type="button" className="btn-confirm" onClick={onClose} style={{ width: '100%' }}>
+            Tutup
+          </button>
+        </div>
       </div>
     </div>
   );

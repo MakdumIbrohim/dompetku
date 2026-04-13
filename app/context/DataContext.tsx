@@ -11,6 +11,7 @@ export type Transaction = {
   title: string;
   atas_nama: string;
   type: TransactionType;
+  category: string;
   metode_pembayaran: string;
   amount: number;
   created_at: string;
@@ -25,6 +26,26 @@ interface DataContextType {
   deleteTransaction: (id: string) => Promise<boolean>;
   updateTransaction: (data: Transaction) => Promise<boolean>;
 }
+
+export const defaultIncomeCategories = [
+  "Gaji",
+  "Bonus",
+  "Investasi",
+  "Penjualan",
+  "Lain-lain Pemasukan",
+];
+
+export const defaultExpenseCategories = [
+  "Makanan & Minuman",
+  "Transportasi",
+  "Belanja",
+  "Tagihan",
+  "Hiburan",
+  "Kesehatan",
+  "Pendidikan",
+  "Cicilan/Utang",
+  "Lain-lain Pengeluaran",
+];
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
@@ -53,6 +74,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
           })() : "",
           title: item.keterangan,
+          category: item.kategori || (item.jenis === "Pemasukan" ? "Lain-lain Pemasukan" : "Lain-lain Pengeluaran"),
           atas_nama: item.atas_nama,
           type: item.jenis as TransactionType,
           metode_pembayaran: item.metode_pembayaran,
@@ -86,6 +108,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       tanggal: data.date,
       keterangan: data.title,
       atas_nama: data.atas_nama,
+      kategori: data.category,
       jenis: data.type,
       metode_pembayaran: data.metode_pembayaran,
       nominal: data.amount,
@@ -104,6 +127,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           id: `temp-${Date.now()}`,
           date: data.date,
           title: data.title,
+          category: data.category,
           atas_nama: data.atas_nama,
           type: data.type,
           metode_pembayaran: data.metode_pembayaran,
@@ -154,6 +178,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           id_transaksi: updatedData.id,
           tanggal: updatedData.date,
           keterangan: updatedData.title,
+          kategori: updatedData.category,
           atas_nama: updatedData.atas_nama,
           jenis: updatedData.type,
           metode_pembayaran: updatedData.metode_pembayaran,
