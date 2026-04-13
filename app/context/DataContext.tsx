@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { useAuth } from "./AuthContext";
 
 type TransactionType = "Pemasukan" | "Pengeluaran";
 
@@ -33,14 +34,16 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [lastFetchedUser, setLastFetchedUser] = useState<string | null>(null);
+  
+  const { user } = useAuth();
 
   const fetchData = useCallback(async () => {
-    if (!GAS_URL) return;
+    if (!GAS_URL || !user) return;
     
     setIsLoading(true);
     try {
-      const res = await fetch(GAS_URL);
+      const res = await fetch(`${GAS_URL}?user=${user.username}`);
       const data = await res.json();
       if (data.status === "success") {
         const mappedData: Transaction[] = data.data.map((item: any) => ({
@@ -54,7 +57,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           created_at: item.created_at,
         })).reverse();
         setTransactions(mappedData);
-        setHasLoaded(true);
+        setLastFetchedUser(user.username);
       }
     } catch (err) {
       console.error("Gagal memuat data:", err);
@@ -63,12 +66,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Initial fetch on mount
+  // Fetch data when user logs in or changes
   useEffect(() => {
-    if (!hasLoaded) {
+    if (user && user.username !== lastFetchedUser) {
       fetchData();
+    } else if (!user) {
+      setTransactions([]);
+      setLastFetchedUser(null);
     }
-  }, [fetchData, hasLoaded]);
+  }, [fetchData, user, lastFetchedUser]);
 
   const addTransaction = async (data: any) => {
     setIsSubmitting(true);
@@ -80,6 +86,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       jenis: data.type,
       metode_pembayaran: data.metode_pembayaran,
       nominal: data.amount,
+      username: user?.username, // Include username
     };
 
     try {

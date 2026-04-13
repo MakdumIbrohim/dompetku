@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../context/ThemeContext";
 import { useData, Transaction } from "../context/DataContext";
+import { useAuth } from "../context/AuthContext";
 
 type Screen = "login" | "dashboard" | "histori" | "kelola";
 type TransactionType = "Pemasukan" | "Pengeluaran";
@@ -38,7 +39,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     deleteTransaction, 
     updateTransaction 
   } = useData();
-  const [user, setUser] = useState<{ nama_lengkap: string } | null>(null);
+  const { user, login, logout, isLoading: isAuthLoading } = useAuth();
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [editData, setEditData] = useState<Transaction | null>(null);
   const [confirmModal, setConfirmModal] = useState<{
@@ -63,23 +64,20 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
 
 
   useEffect(() => {
-    const userStr = localStorage.getItem("dompetku_user");
-    if (!userStr && screen !== "login") {
+    if (!isAuthLoading && !user && screen !== "login") {
       router.push("/login");
-    } else if (userStr) {
-      const userData = JSON.parse(userStr);
-      setUser(userData);
+    } else if (user) {
       // Pre-fill nama user ke form 'atas_nama'
-      setForm((prev) => ({ ...prev, atas_nama: userData.nama_lengkap }));
+      setForm((prev) => ({ ...prev, atas_nama: user.nama_lengkap }));
 
       // Cek apakah baru saja login untuk menampilkan toast di dashboard
       const showToastFlag = localStorage.getItem("dompetku_show_login_toast");
       if (showToastFlag === "true" && screen === "dashboard") {
-        showToast(`Selamat datang kembali, ${userData.nama_lengkap}!`, "success");
+        showToast(`Selamat datang kembali, ${user.nama_lengkap}!`, "success");
         localStorage.removeItem("dompetku_show_login_toast");
       }
     }
-  }, [screen, router, showToast]);
+  }, [screen, router, showToast, user, isAuthLoading]);
 
 
   const totals = useMemo(() => {
@@ -170,7 +168,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     return (
       <>
         {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-        <LoginScreen showToast={showToast} />
+        <LoginScreen showToast={showToast} onLogin={login} />
       </>
     );
   }
@@ -278,10 +276,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             <button
               className="logout-button"
               type="button"
-              onClick={() => {
-                localStorage.setItem("dompetku_show_logout_toast", "true");
-                router.push("/login");
-              }}
+              onClick={logout}
             >
               <LogOutIcon />
               Logout
@@ -391,14 +386,10 @@ function Sidebar({
   );
 }
 
-function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" | "error") => void }) {
-  const router = useRouter();
+function LoginScreen({ showToast, onLogin }: { showToast: (msg: string, type: "success" | "error") => void, onLogin: (user: any) => void }) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Logout otomatis (hapus sesi dari localStorage)
-    localStorage.removeItem("dompetku_user");
-
     // Cek apakah baru saja logout untuk menampilkan toast
     const showLogoutToast = localStorage.getItem("dompetku_show_logout_toast");
     if (showLogoutToast === "true") {
@@ -424,10 +415,7 @@ function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" |
       const data = await res.json();
 
       if (res.ok && data.user) {
-        localStorage.setItem("dompetku_user", JSON.stringify(data.user));
-        // Set flag untuk tampilkan toast di dashboard
-        localStorage.setItem("dompetku_show_login_toast", "true");
-        router.push("/");
+        onLogin(data.user);
       } else {
         showToast(data.error || "Gagal login", "error");
       }

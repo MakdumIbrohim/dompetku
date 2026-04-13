@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 
 import { ThemeProvider } from "./context/ThemeContext";
 import { DataProvider } from "./context/DataContext";
+import { AuthProvider } from "./context/AuthContext";
 
 export default function RootLayout({
   children,
@@ -24,9 +25,11 @@ export default function RootLayout({
   return (
     <html lang="id" className={`h-full antialiased ${inter.variable}`}>
       <body className="min-h-full flex flex-col">
-        <DataProvider>
-          <ThemeProvider>{children}</ThemeProvider>
-        </DataProvider>
+        <AuthProvider>
+          <DataProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </DataProvider>
+        </AuthProvider>
       </body>
     </html>
   );
