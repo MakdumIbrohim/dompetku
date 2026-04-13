@@ -60,11 +60,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         setLastFetchedUser(user.username);
       }
     } catch (err) {
-      console.error("Gagal memuat data:", err);
+      console.error("Terjadi kesalahan koneksi ke server", err);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user, GAS_URL]);
 
   // Fetch data when user logs in or changes
   useEffect(() => {

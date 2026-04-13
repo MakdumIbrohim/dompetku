@@ -255,7 +255,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             <p>Management Keuangan</p>
             <h1>
               {screen === "dashboard" 
-                ? `Halo, ${user?.nama_lengkap || "Pengguna"}!` 
+                ? `Halo, ${user?.nama_lengkap || "Pengguna"}! (${user?.username || "..."})` 
                 : screen === "histori" 
                 ? "Histori Transaksi" 
                 : "Kelola Data"}
