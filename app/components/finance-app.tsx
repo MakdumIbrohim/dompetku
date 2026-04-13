@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "../context/ThemeContext";
 
 type Screen = "login" | "dashboard" | "histori" | "kelola";
 type TransactionType = "Pemasukan" | "Pengeluaran";
@@ -35,7 +36,7 @@ const menuItems = [
 const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || "";
 
 export default function FinanceApp({ screen }: { screen: Screen }) {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const { theme, toggleTheme } = useTheme();
   const [formType, setFormType] = useState<TransactionType>("Pemasukan");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -64,14 +65,6 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     setToast({ message, type });
   }, []);
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("dompetku_theme") as "light" | "dark" | null;
-    if (savedTheme) setTheme(savedTheme);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("dompetku_theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     const userStr = localStorage.getItem("dompetku_user");
@@ -371,7 +364,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
                 theme === "light" ? "Aktifkan dark mode" : "Aktifkan light mode"
               }
               title={theme === "light" ? "Dark mode" : "Light mode"}
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              onClick={toggleTheme}
             >
               {theme === "light" ? <MoonIcon /> : <SunIcon />}
             </button>
