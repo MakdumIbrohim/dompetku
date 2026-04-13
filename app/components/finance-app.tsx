@@ -762,7 +762,7 @@ function HistoryScreen({
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const availableYears = useMemo(() => {
     if (!mounted) return [];
@@ -1116,7 +1116,7 @@ function KelolaScreen({
 }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((t) => {
