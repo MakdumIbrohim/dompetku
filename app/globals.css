@@ -31,6 +31,9 @@
 
   /* Borders */
   --border:        rgb(63 58 54 / 7%);
+
+  /* Solid surface for inputs */
+  --surface:       #ffffff;
 }
 
 .income-text { color: var(--green); }
@@ -97,6 +100,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
   --shape-a:     #2f303a;
   --shape-b:     #292a33;
   --slate-deep:  #3d4654;
+  --surface:     #2d2e38;
   background: var(--bg);
   color: var(--fg);
 }
@@ -595,7 +599,7 @@ select {
   border: 1.5px solid var(--border);
   border-radius: 12px;
   padding: 0 14px;
-  background: rgb(255 255 255 / 84%);
+  background-color: var(--surface);
   color: var(--fg);
   outline: none;
   transition: border-color 160ms ease, box-shadow 160ms ease;
@@ -603,7 +607,7 @@ select {
 
 .is-dark input,
 .is-dark select {
-  background: rgb(255 255 255 / 8%);
+  background-color: var(--surface);
   color: var(--fg);
   border-color: var(--border);
 }

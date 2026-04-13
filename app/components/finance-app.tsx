@@ -905,7 +905,7 @@ function HistoryScreen({
           placeholder="Cari transaksi..."
           value={searchQuery}
           onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-          style={{ flexGrow: 1, minWidth: '200px', padding: '10px 14px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--surface)', color: 'inherit' }}
+          style={{ flexGrow: 1, minWidth: '200px', padding: '10px 14px', borderRadius: '12px', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: 'inherit' }}
         />
         <select value={filterYear} onChange={handleYearChange} aria-label="Filter Tahun">
           <option value="all">Semua Tahun</option>
@@ -1146,7 +1146,7 @@ function KelolaScreen({
               placeholder="Cari data..."
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              style={{ width: '250px', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface)', color: 'inherit', fontSize: '14px' }}
+              style={{ width: '250px', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: 'inherit', fontSize: '14px' }}
             />
             <span>{filteredTransactions.length} total data</span>
           </div>
@@ -1360,25 +1360,25 @@ function EditTransactionModal({
         <h2>Edit Transaksi</h2>
         <form onSubmit={(e) => { e.preventDefault(); onSubmit(form); }}>
           <div className="form-grid" style={{ marginBottom: '14px' }}>
-            <label>Tanggal <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required /></label>
-            <label>Keterangan <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required /></label>
+            <label>Tanggal <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required style={{ backgroundColor: 'var(--surface)' }} /></label>
+            <label>Keterangan <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required style={{ backgroundColor: 'var(--surface)' }} /></label>
           </div>
           <div className="form-grid" style={{ marginBottom: '14px' }}>
-            <label>Atas Nama <input value={form.atas_nama} onChange={(e) => setForm({ ...form, atas_nama: e.target.value })} /></label>
+            <label>Atas Nama <input value={form.atas_nama} onChange={(e) => setForm({ ...form, atas_nama: e.target.value })} style={{ backgroundColor: 'var(--surface)' }} /></label>
             <label>Metode
-              <select value={form.metode_pembayaran} onChange={(e) => setForm({ ...form, metode_pembayaran: e.target.value })}>
+              <select value={form.metode_pembayaran} onChange={(e) => setForm({ ...form, metode_pembayaran: e.target.value })} style={{ backgroundColor: 'var(--surface)' }}>
                 {metodeOptions.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </label>
           </div>
           <div className="form-grid" style={{ marginBottom: '14px' }}>
             <label>Tipe
-              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as TransactionType, category: e.target.value === "Pemasukan" ? defaultIncomeCategories[0] : defaultExpenseCategories[0] })}>
+              <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as TransactionType, category: e.target.value === "Pemasukan" ? defaultIncomeCategories[0] : defaultExpenseCategories[0] })} style={{ backgroundColor: 'var(--surface)' }}>
                 <option value="Pemasukan">Pemasukan</option>
                 <option value="Pengeluaran">Pengeluaran</option>
               </select>
             </label>
-            <label>Nominal <input inputMode="numeric" value={form.amount ? Number(form.amount).toLocaleString('id-ID') : ''} onChange={(e) => setForm({ ...form, amount: Number(e.target.value.replace(/\D/g, "")) })} required /></label>
+            <label>Nominal <input inputMode="numeric" value={form.amount ? Number(form.amount).toLocaleString('id-ID') : ''} onChange={(e) => setForm({ ...form, amount: Number(e.target.value.replace(/\D/g, "")) })} required style={{ backgroundColor: 'var(--surface)' }} /></label>
           </div>
           <div className="modal-actions" style={{ marginTop: '24px' }}>
             <button type="button" className="btn-cancel" onClick={onClose} disabled={isLoading}>Batal</button>
@@ -1531,7 +1531,7 @@ function DonutChart({ income, expense }: { income: number; expense: number }) {
       </div>
       <div className="legend-list">
         {breakdown.map((item) => (
-          <span key={item.label}>
+          <span key={item.label} style={{ padding: '0 14px', backgroundColor: 'var(--surface)' }}>
             <i style={{ background: item.color }} />
             {item.label}
             <b>{item.value}%</b>
