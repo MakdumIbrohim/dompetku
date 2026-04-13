@@ -1430,14 +1430,15 @@ select:focus {
 .detail-balance-card {
   margin: 0 20px 20px;
   padding: 18px;
-  background: var(--slate-deep);
-  color: #fff;
+  background: var(--bg);
+  color: var(--fg);
   border-radius: 16px;
+  border: 1px solid var(--border);
   box-shadow: 0 4px 12px var(--border);
 }
 
 .is-dark .detail-balance-card {
-  background: #24276b;
+  background: var(--bg);
 }
 
 .balance-info {
@@ -1466,18 +1467,27 @@ select:focus {
   font-weight: 800;
 }
 
+.detail-balance-card .income-text {
+  color: var(--green);
+}
+
+.detail-balance-card .expense-text {
+  color: var(--rose);
+}
+
 .balance-arrow {
   font-size: 20px;
+  color: var(--muted);
   opacity: 0.5;
 }
 
 .balance-footer {
   padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid var(--border);
   font-size: 12px;
   font-weight: 700;
   text-align: center;
-  opacity: 0.8;
+  color: var(--muted);
 }
 
 .detail-modal .modal-actions {
