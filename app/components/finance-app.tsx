@@ -991,7 +991,6 @@ function HistoryScreen({
               <tr>
                 <th>Tanggal</th>
                 <th>Keterangan</th>
-                <th>Kategori</th>
                 <th>Atas Nama</th>
                 <th>Metode</th>
                 <th>Tipe</th>
@@ -1001,15 +1000,15 @@ function HistoryScreen({
             <tbody>
               {isLoading ? (
                 <>
-                  <TableRowSkeleton columns={7} />
-                  <TableRowSkeleton columns={7} />
-                  <TableRowSkeleton columns={7} />
-                  <TableRowSkeleton columns={7} />
-                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={6} />
+                  <TableRowSkeleton columns={6} />
+                  <TableRowSkeleton columns={6} />
+                  <TableRowSkeleton columns={6} />
+                  <TableRowSkeleton columns={6} />
                 </>
               ) : currentTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada histori transaksi.</td>
+                  <td colSpan={6} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada histori transaksi.</td>
                 </tr>
               ) : (
                 currentTransactions.map((item) => (
@@ -1085,7 +1084,6 @@ function HistoryRow({
       <td>
         <strong>{item.title}</strong>
       </td>
-      <td>{item.category}</td>
       <td>{item.atas_nama}</td>
       <td>{item.metode_pembayaran}</td>
       <td>
@@ -1157,7 +1155,6 @@ function KelolaScreen({
               <tr>
                 <th>Tanggal</th>
                 <th>Keterangan</th>
-                <th>Kategori</th>
                 <th>Atas Nama</th>
                 <th>Metode</th>
                 <th>Tipe</th>
@@ -1168,15 +1165,15 @@ function KelolaScreen({
             <tbody>
               {isLoading ? (
                 <>
-                  <TableRowSkeleton columns={8} />
-                  <TableRowSkeleton columns={8} />
-                  <TableRowSkeleton columns={8} />
-                  <TableRowSkeleton columns={8} />
-                  <TableRowSkeleton columns={8} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
                 </>
               ) : currentTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={8} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada data untuk dikelola.</td>
+                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada data untuk dikelola.</td>
                 </tr>
               ) : (
                 currentTransactions.map((item) => (
@@ -1278,7 +1275,6 @@ function KelolaRow({ item, onDelete, onEdit }: { item: Transaction; onDelete: (i
     <tr className={`history-row ${item.type}`}>
       <td style={{ whiteSpace: "nowrap" }}>{formatDate(item.date)}</td>
       <td><strong>{item.title}</strong></td>
-      <td>{item.category}</td>
       <td>{item.atas_nama}</td>
       <td>{item.metode_pembayaran}</td>
       <td>
