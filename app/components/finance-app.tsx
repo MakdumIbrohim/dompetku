@@ -48,7 +48,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
     data?: any;
   }>({ isOpen: false, action: null });
   const [form, setForm] = useState({
-    date: "2026-04-12",
+    date: new Date().toISOString().split("T")[0],
     title: "",
     atas_nama: "",
     type: "Pemasukan" as TransactionType,
