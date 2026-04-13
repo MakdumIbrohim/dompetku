@@ -502,17 +502,13 @@ a, button { -webkit-tap-highlight-color: transparent; }
   position: relative;
   width: 120px;
   aspect-ratio: 1;
-  border-radius: 50%;
 }
 
-.donut-chart span {
-  position: absolute;
-  inset: 36px;
-  border-radius: 50%;
-  background: var(--bg);
+.donut-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
-
-.is-dark .donut-chart span { background: #23242d; }
 
 .legend-list {
   display: grid;
@@ -1575,14 +1571,9 @@ select:focus {
 
   /* Compact Chart */
   .donut-chart { 
-    width: 100px !important; 
-    height: 100px !important; 
+    width: 80px !important; 
+    height: 80px !important; 
     margin: 0 !important;
-  }
-
-  .donut-chart span {
-    background: white !important;
-    inset: 30px !important; /* Menyesuaikan ukuran lubang karena ukuran chart lebih kecil saat diprint */
   }
   
   .legend-list { font-size: 10px !important; gap: 8px !important; }

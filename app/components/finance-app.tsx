@@ -1487,6 +1487,10 @@ function DonutChart({ income, expense }: { income: number; expense: number }) {
   const incomePct = total === 0 ? 0 : Math.round((income / total) * 100);
   const expensePct = total === 0 ? 0 : 100 - incomePct;
 
+  // SVG calculations for the donut chart
+  const incomeValue = total === 0 ? 0 : incomePct;
+  const expenseValue = total === 0 ? 0 : expensePct;
+
   const breakdown = [
     { label: "Pemasukan", value: incomePct, color: "var(--green)" },
     { label: "Pengeluaran", value: expensePct, color: "var(--rose)" },
@@ -1494,16 +1498,36 @@ function DonutChart({ income, expense }: { income: number; expense: number }) {
 
   return (
     <>
-      <div 
-        className="donut-chart" 
-        aria-label="Grafik pengeluaran"
-        style={{
-          background: total === 0 
-            ? "conic-gradient(var(--border) 0 100%)" 
-            : `conic-gradient(var(--green) 0 ${incomePct}%, var(--rose) ${incomePct}% 100%)`
-        }}
-      >
-        <span />
+      <div className="donut-chart" aria-label="Grafik pengeluaran">
+        <svg viewBox="0 0 36 36" className="donut-svg">
+          {/* Background circle */}
+          <circle 
+            cx="18" cy="18" r="15.9155" 
+            fill="none" 
+            stroke="var(--border)" 
+            strokeWidth="4" 
+          />
+          {/* Income segment */}
+          <circle 
+            cx="18" cy="18" r="15.9155" 
+            fill="none" 
+            stroke="var(--green)" 
+            strokeWidth="4" 
+            strokeDasharray={`${incomeValue} ${100 - incomeValue}`}
+            strokeDashoffset="25"
+            style={{ transition: "stroke-dasharray 0.3s ease" }}
+          />
+          {/* Expense segment */}
+          <circle 
+            cx="18" cy="18" r="15.9155" 
+            fill="none" 
+            stroke="var(--rose)" 
+            strokeWidth="4" 
+            strokeDasharray={`${expenseValue} ${100 - expenseValue}`}
+            strokeDashoffset={25 - incomeValue}
+            style={{ transition: "stroke-dasharray 0.3s ease" }}
+          />
+        </svg>
       </div>
       <div className="legend-list">
         {breakdown.map((item) => (
@@ -1517,6 +1541,7 @@ function DonutChart({ income, expense }: { income: number; expense: number }) {
     </>
   );
 }
+
 
 function Toast({ message, type, onClose }: { message: string; type: "success" | "error"; onClose: () => void }) {
   useEffect(() => {
