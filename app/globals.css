@@ -898,7 +898,10 @@ select:focus {
 .history-metrics strong { font-size: 22px; font-weight: 800; }
 
 /* ─── History table ─────────────────────────────────── */
-.history-table { padding: 24px; }
+.history-table { 
+  padding: 24px; 
+  min-width: 0; /* Mencegah layout Grid memaksakan ukuran hingga melewati batas layar */
+}
 
 .history-table table {
   width: 100%;
@@ -1578,6 +1581,8 @@ select:focus {
   .login-panel { grid-template-columns: 1fr; }
 
   .login-art { min-height: 220px; }
+
+  .history-table { padding: 16px 12px; } /* Sedikit melegakan ruang padding saat di mode HP */
 }
 
 /* ─── Responsive · ≤390px ───────────────────────────── */
