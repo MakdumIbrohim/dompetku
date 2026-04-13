@@ -206,6 +206,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
           onSubmit={(updated) => {
             setConfirmModal({ isOpen: true, action: "edit", data: updated });
           }} 
+          isLoading={isSubmitting}
         />
       )}
 
@@ -226,6 +227,7 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             confirmModal.action === "edit" ? "Ya, Perbarui" : "Ya, Hapus"
           }
           isDanger={confirmModal.action === "delete"}
+          isLoading={isSubmitting}
         >
           {confirmModal.action === "delete" ? (
             <p>Apakah Anda yakin ingin menghapus transaksi ini? Data yang dihapus tidak dapat dikembalikan.</p>
@@ -1169,6 +1171,7 @@ function ConfirmModal({
   onCancel,
   confirmText = "Konfirmasi",
   isDanger = false,
+  isLoading = false,
 }: {
   isOpen: boolean;
   title: string;
@@ -1177,6 +1180,7 @@ function ConfirmModal({
   onCancel: () => void;
   confirmText?: string;
   isDanger?: boolean;
+  isLoading?: boolean;
 }) {
   if (!isOpen) return null;
   return (
@@ -1185,8 +1189,11 @@ function ConfirmModal({
         <h2>{title}</h2>
         <div className="modal-body">{children}</div>
         <div className="modal-actions">
-          <button type="button" className="btn-cancel" onClick={onCancel}>Batal</button>
-          <button type="button" className={`btn-confirm ${isDanger ? 'danger' : ''}`} onClick={onConfirm}>{confirmText}</button>
+          <button type="button" className="btn-cancel" onClick={onCancel} disabled={isLoading}>Batal</button>
+          <button type="button" className={`btn-confirm ${isDanger ? 'danger' : ''} ${isLoading ? 'is-loading' : ''}`} onClick={onConfirm} disabled={isLoading}>
+            {isLoading && <SpinnerIcon />}
+            {confirmText}
+          </button>
         </div>
       </div>
     </div>
@@ -1196,11 +1203,13 @@ function ConfirmModal({
 function EditTransactionModal({
   item,
   onClose,
-  onSubmit
+  onSubmit,
+  isLoading = false
 }: {
   item: Transaction;
   onClose: () => void;
   onSubmit: (updated: Transaction) => void;
+  isLoading?: boolean;
 }) {
   const [form, setForm] = useState(item);
   const metodeOptions = ["Tunai", "Transfer", "E-Wallet", "Kartu Kredit"];
@@ -1232,8 +1241,11 @@ function EditTransactionModal({
             <label>Nominal <input inputMode="numeric" value={form.amount ? Number(form.amount).toLocaleString('id-ID') : ''} onChange={(e) => setForm({ ...form, amount: Number(e.target.value.replace(/\D/g, "")) })} required /></label>
           </div>
           <div className="modal-actions" style={{ marginTop: '24px' }}>
-            <button type="button" className="btn-cancel" onClick={onClose}>Batal</button>
-            <button type="submit" className="btn-confirm">Lanjut</button>
+            <button type="button" className="btn-cancel" onClick={onClose} disabled={isLoading}>Batal</button>
+            <button type="submit" className={`btn-confirm ${isLoading ? 'is-loading' : ''}`} disabled={isLoading}>
+              {isLoading && <SpinnerIcon />}
+              Lanjut
+            </button>
           </div>
         </form>
       </div>

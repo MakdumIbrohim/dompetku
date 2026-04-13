@@ -114,7 +114,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const deleteTransaction = async (id: string) => {
     const prev = [...transactions];
     setTransactions((items) => items.filter((i) => i.id !== id));
-
+    setIsSubmitting(true);
     try {
       await fetch(GAS_URL, {
         method: "POST",
@@ -126,13 +126,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       console.error("Gagal menghapus:", err);
       setTransactions(prev);
       return false;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const updateTransaction = async (updatedData: Transaction) => {
     const prev = [...transactions];
     setTransactions((items) => items.map((i) => (i.id === updatedData.id ? updatedData : i)));
-
+    setIsSubmitting(true);
     try {
       await fetch(GAS_URL, {
         method: "POST",
@@ -153,6 +155,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       console.error("Gagal memperbarui:", err);
       setTransactions(prev);
       return false;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

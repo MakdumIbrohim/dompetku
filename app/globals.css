@@ -1220,18 +1220,26 @@ select:focus {
 
 
 /* ─── Button Loading states ────────────────────────── */
-.primary-action.is-loading {
+.primary-action.is-loading,
+.btn-confirm.is-loading {
   position: relative;
   color: transparent !important;
   pointer-events: none;
 }
 
-.primary-action.is-loading .spinner {
+.primary-action.is-loading .spinner,
+.btn-confirm.is-loading .spinner {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  color: #fff;
+  color: #fff !important;
+  opacity: 1 !important;
+  animation: spin-centered 1s linear infinite !important;
+}
+
+@keyframes spin-centered {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 
