@@ -557,8 +557,9 @@ function LoginScreen({ showToast }: { showToast: (msg: string, type: "success" |
             Password
             <input name="password" placeholder="password" type="password" required />
           </label>
-          <button className="primary-action" type="submit" disabled={isLoading}>
-            {isLoading ? "Memproses..." : "Masuk"}
+          <button className={`primary-action ${isLoading ? 'is-loading' : ''}`} type="submit" disabled={isLoading}>
+            {isLoading && <SpinnerIcon />}
+            Masuk
           </button>
         </form>
       </section>
@@ -606,20 +607,32 @@ function DashboardScreen({
   return (
     <div className="dashboard-grid">
       <section className="summary-card balance-card">
-        <p>Total saldo</p>
-        <strong>{rupiah.format(totals.balance)}</strong>
-        <div>
-          <span>Pemasukan {rupiah.format(totals.income)}</span>
-          <span>Pengeluaran {rupiah.format(totals.expense)}</span>
-        </div>
+        {isLoading ? (
+          <SummaryCardSkeleton />
+        ) : (
+          <>
+            <p>Total saldo</p>
+            <strong>{rupiah.format(totals.balance)}</strong>
+            <div>
+              <span>Pemasukan {rupiah.format(totals.income)}</span>
+              <span>Pengeluaran {rupiah.format(totals.expense)}</span>
+            </div>
+          </>
+        )}
       </section>
 
       <section className="summary-card chart-card">
-        <div>
-          <p>Graphic statistic</p>
-          <h2>Pengeluaran bulan ini</h2>
-        </div>
-        <DonutChart income={totals.income} expense={totals.expense} />
+        {isLoading ? (
+          <ChartSkeleton />
+        ) : (
+          <>
+            <div>
+              <p>Graphic statistic</p>
+              <h2>Pengeluaran bulan ini</h2>
+            </div>
+            <DonutChart income={totals.income} expense={totals.expense} />
+          </>
+        )}
       </section>
 
       <form className={`transaction-form ${formType}`} onSubmit={onSubmit}>
@@ -735,8 +748,9 @@ function DashboardScreen({
             </div>
           </div>
         )}
-        <button className="primary-action" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Menyimpan ke Google Sheet..." : "Simpan transaksi"}
+        <button className={`primary-action ${isSubmitting ? 'is-loading' : ''}`} type="submit" disabled={isSubmitting}>
+          {isSubmitting && <SpinnerIcon />}
+          Simpan transaksi
         </button>
       </form>
 
@@ -747,7 +761,11 @@ function DashboardScreen({
         </div>
         <div className="recent-list">
           {isLoading ? (
-            <p style={{ gridColumn: "1 / -1", textAlign: "center", padding: "20px", color: "var(--muted)" }}>Memuat data...</p>
+            <>
+              <TransactionSkeleton />
+              <TransactionSkeleton />
+              <TransactionSkeleton />
+            </>
           ) : transactions.length === 0 ? (
             <p style={{ gridColumn: "1 / -1", textAlign: "center", padding: "20px", color: "var(--muted)" }}>Belum ada transaksi.</p>
           ) : (
@@ -923,17 +941,36 @@ function HistoryScreen({
       </div>
 
       <section className="history-summary">
-        <div>
-          <p>Total Pengeluaran</p>
-          <strong>{rupiah.format(filteredTotals.expense)}</strong>
-        </div>
-        <DonutChart income={filteredTotals.income} expense={filteredTotals.expense} />
+        {isLoading ? (
+          <div style={{ display: 'contents' }}>
+            <div style={{ gridColumn: '1 / span 2' }}><SummaryCardSkeleton /></div>
+            <ChartSkeleton />
+          </div>
+        ) : (
+          <>
+            <div>
+              <p>Total Pengeluaran</p>
+              <strong>{rupiah.format(filteredTotals.expense)}</strong>
+            </div>
+            <DonutChart income={filteredTotals.income} expense={filteredTotals.expense} />
+          </>
+        )}
       </section>
 
       <section className="history-metrics">
-        <MetricCard label="Total Pemasukan" value={rupiah.format(filteredTotals.income)} />
-        <MetricCard label="Total Pengeluaran" value={rupiah.format(filteredTotals.expense)} />
-        <MetricCard label="Sisa Saldo" value={rupiah.format(filteredTotals.balance)} />
+        {isLoading ? (
+          <>
+            <SummaryCardSkeleton />
+            <SummaryCardSkeleton />
+            <SummaryCardSkeleton />
+          </>
+        ) : (
+          <>
+            <MetricCard label="Total Pemasukan" value={rupiah.format(filteredTotals.income)} />
+            <MetricCard label="Total Pengeluaran" value={rupiah.format(filteredTotals.expense)} />
+            <MetricCard label="Sisa Saldo" value={rupiah.format(filteredTotals.balance)} />
+          </>
+        )}
       </section>
 
       <section className="history-table">
@@ -955,9 +992,13 @@ function HistoryScreen({
             </thead>
             <tbody>
               {isLoading ? (
-                <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Memuat data dari Spreadsheet...</td>
-                </tr>
+                <>
+                  <TableRowSkeleton columns={6} />
+                  <TableRowSkeleton columns={6} />
+                  <TableRowSkeleton columns={6} />
+                  <TableRowSkeleton columns={6} />
+                  <TableRowSkeleton columns={6} />
+                </>
               ) : currentTransactions.length === 0 ? (
                 <tr>
                   <td colSpan={6} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada histori transaksi.</td>
@@ -1082,9 +1123,13 @@ function KelolaScreen({
             </thead>
             <tbody>
               {isLoading ? (
-                <tr>
-                  <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Memuat data dari Spreadsheet...</td>
-                </tr>
+                <>
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                  <TableRowSkeleton columns={7} />
+                </>
               ) : currentTransactions.length === 0 ? (
                 <tr>
                   <td colSpan={7} style={{ textAlign: "center", padding: "24px", color: "var(--muted)" }}>Belum ada data untuk dikelola.</td>
@@ -1116,6 +1161,71 @@ function KelolaScreen({
         )}
       </section>
     </div>
+  );
+}
+
+function SpinnerIcon() {
+  return (
+    <svg className="spinner" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  );
+}
+
+function TransactionSkeleton() {
+  return (
+    <article className="transaction-row" style={{ pointerEvents: 'none' }}>
+      <div className="row-icon skeleton-box" style={{ background: 'transparent' }}></div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="skeleton-box" style={{ width: '60%', height: '14px' }}></div>
+        <div className="skeleton-box" style={{ width: '80%', height: '10px' }}></div>
+      </div>
+      <div className="skeleton-box" style={{ width: '60px', height: '14px', marginLeft: 'auto' }}></div>
+    </article>
+  );
+}
+
+function SummaryCardSkeleton() {
+  return (
+    <div style={{ display: 'grid', gap: '12px', width: '100%' }}>
+      <div className="skeleton-box" style={{ width: '40%', height: '10px' }}></div>
+      <div className="skeleton-box" style={{ width: '80%', height: '32px' }}></div>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="skeleton-box" style={{ width: '100px', height: '28px', borderRadius: '10px' }}></div>
+        <div className="skeleton-box" style={{ width: '100px', height: '28px', borderRadius: '10px' }}></div>
+      </div>
+    </div>
+  );
+}
+
+function ChartSkeleton() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+      <div style={{ display: 'grid', gap: '8px', flex: 1 }}>
+        <div className="skeleton-box" style={{ width: '40%', height: '10px' }}></div>
+        <div className="skeleton-box" style={{ width: '80%', height: '24px' }}></div>
+      </div>
+      <div className="skeleton-box" style={{ width: '100px', height: '100px', borderRadius: '50%' }}></div>
+    </div>
+  );
+}
+
+function TableRowSkeleton({ columns }: { columns: number }) {
+  return (
+    <tr className="history-row" style={{ pointerEvents: 'none' }}>
+      {Array.from({ length: columns }).map((_, i) => (
+        <td key={i}>
+          <div 
+            className="skeleton-box" 
+            style={{ 
+              width: i === columns - 1 || i === columns - 2 ? '60%' : '80%', 
+              height: '14px', 
+              marginLeft: i === columns - 1 ? 'auto' : '0' 
+            }}
+          ></div>
+        </td>
+      ))}
+    </tr>
   );
 }
 

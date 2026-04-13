@@ -1164,6 +1164,70 @@ select:focus {
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* ─── Loading Animations ────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+.skeleton-box {
+  position: relative;
+  overflow: hidden;
+  background: var(--shape-a);
+  border-radius: 6px;
+}
+
+.skeleton-box::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 255 255 / 15%) 40%,
+    rgb(255 255 255 / 25%) 50%,
+    rgb(255 255 255 / 15%) 60%,
+    transparent 100%
+  );
+  animation: skeleton-shimmer 2s infinite ease-in-out;
+  transform: translateX(-100%);
+}
+
+.is-dark .skeleton-box::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 255 255 / 4%) 40%,
+    rgb(255 255 255 / 8%) 50%,
+    rgb(255 255 255 / 4%) 60%,
+    transparent 100%
+  );
+}
+
+@keyframes skeleton-shimmer {
+  100% { transform: translateX(100%); }
+}
+
+
+/* ─── Button Loading states ────────────────────────── */
+.primary-action.is-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.primary-action.is-loading .spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+}
+
+
 /* ─── Print Styles (Export PDF) ─────────────────────── */
 .print-only,
 .report-header-print {
