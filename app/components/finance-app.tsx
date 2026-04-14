@@ -1507,53 +1507,67 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
       days.push({
         date: dateStr,
         label: dayLabels[d.getDay()],
-        amount: 0
+        income: 0,
+        expense: 0
       });
     }
     
-    // 2. Isi data pengeluaran
+    // 2. Isi data pemasukan & pengeluaran
     transactions.forEach(t => {
-      if (t.type === "Pengeluaran") {
-        const day = days.find(d => d.date === t.date);
-        if (day) day.amount += t.amount;
+      const day = days.find(d => d.date === t.date);
+      if (day) {
+        if (t.type === "Pemasukan") day.income += t.amount;
+        else day.expense += t.amount;
       }
     });
     
     return days;
   }, [transactions]);
 
-  const maxAmount = Math.max(...last7Days.map(d => d.amount), 1);
+  const maxAmount = Math.max(
+    ...last7Days.map(d => d.income), 
+    ...last7Days.map(d => d.expense), 
+    1
+  );
+  
   const chartHeight = 160;
   const chartWidth = 1000;
   const paddingX = 80;
   
-  // 3. Kalkulasi koordinat titik (dengan padding agar pas dengan teks)
+  // 3. Kalkulasi koordinat titik
   const points = last7Days.map((d, i) => {
     const x = paddingX + (i / (last7Days.length - 1)) * (chartWidth - paddingX * 2);
-    const y = chartHeight - (d.amount / maxAmount) * (chartHeight - 30);
-    return { x, y };
+    const incomeY = chartHeight - (d.income / maxAmount) * (chartHeight - 30);
+    const expenseY = chartHeight - (d.expense / maxAmount) * (chartHeight - 30);
+    return { x, incomeY, expenseY };
   });
 
-  // Buat path string
-  const pathD = points.length > 0 ? points.reduce((acc, p, i) => 
-    i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, 
-  "") : "";
+  const getPath = (attr: 'incomeY' | 'expenseY') => 
+    points.reduce((acc, p, i) => i === 0 ? `M ${p.x} ${p[attr]}` : `${acc} L ${p.x} ${p[attr]}`, "");
   
-  const areaD = points.length > 0 ? `${pathD} L ${points[points.length-1].x} ${chartHeight} L ${points[0].x} ${chartHeight} Z` : "";
+  const incomePath = getPath('incomeY');
+  const expensePath = getPath('expenseY');
+  
+  const incomeArea = `${incomePath} L ${points[points.length-1].x} ${chartHeight} L ${points[0].x} ${chartHeight} Z`;
+  const expenseArea = `${expensePath} L ${points[points.length-1].x} ${chartHeight} L ${points[0].x} ${chartHeight} Z`;
 
   return (
     <div className="trend-content" style={{ width: '100%', marginTop: '16px' }}>
       <svg 
-        viewBox={`0 0 ${chartWidth} ${chartHeight + 50}`} 
+        viewBox={`0 0 ${chartWidth} ${chartHeight + 80}`} 
         className="trend-svg" 
         width="100%" 
         height="auto"
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
-          <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--slate-mid)" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="var(--slate-mid)" stopOpacity="0" />
+          <linearGradient id="incomeGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--green)" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="var(--green)" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--rose)" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="var(--rose)" stopOpacity="0" />
           </linearGradient>
         </defs>
         
@@ -1569,35 +1583,35 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
           />
         ))}
 
-        {/* Area fill */}
-        <path d={areaD} fill="url(#trendGradient)" />
+        {/* Areas */}
+        <path d={incomeArea} fill="url(#incomeGradient)" />
+        <path d={expenseArea} fill="url(#expenseGradient)" />
         
-        {/* Line */}
-        <path 
-          d={pathD} 
-          fill="none" 
-          stroke="var(--slate-mid)" 
-          strokeWidth="3" 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-        />
+        {/* Lines */}
+        <path d={expensePath} fill="none" stroke="var(--rose)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
-        {/* Dots & Labels */}
+        {/* Labels & Markers */}
         {points.map((p, i) => (
           <g key={i}>
-            <circle cx={p.x} cy={p.y} r="5" fill="var(--bg-card)" stroke="var(--slate-mid)" strokeWidth="2.5" />
-            <text 
-              x={p.x} 
-              y={chartHeight + 35} 
-              textAnchor="middle" 
-              fontSize="14" 
-              fill="var(--muted)" 
-              fontWeight="700"
-            >
+            {/* Markers */}
+            <circle cx={p.x} cy={p.incomeY} r="4" fill="var(--bg-card)" stroke="var(--green)" strokeWidth="2.5" />
+            <circle cx={p.x} cy={p.expenseY} r="4" fill="var(--bg-card)" stroke="var(--rose)" strokeWidth="2.5" />
+            
+            {/* Day Labels */}
+            <text x={p.x} y={chartHeight + 35} textAnchor="middle" fontSize="14" fill="var(--muted)" fontWeight="700">
               {last7Days[i].label}
             </text>
           </g>
         ))}
+
+        {/* Legend */}
+        <g transform={`translate(${chartWidth/2 - 100}, ${chartHeight + 65})`}>
+          <circle cx="0" cy="0" r="5" fill="var(--green)" />
+          <text x="12" y="5" fontSize="13" fontWeight="700" fill="var(--muted)">Pemasukan</text>
+          
+          <circle cx="110" cy="0" r="5" fill="var(--rose)" />
+          <text x="122" y="5" fontSize="13" fontWeight="700" fill="var(--muted)">Pengeluaran</text>
+        </g>
       </svg>
     </div>
   );
