@@ -602,13 +602,11 @@ function DashboardScreen({
         {isLoading ? (
           <ChartSkeleton />
         ) : (
-          <>
-            <div>
-              <p>Graphic statistic</p>
-              <h2>Pengeluaran bulan ini</h2>
-            </div>
-            <DonutChart income={totals.income} expense={totals.expense} />
-          </>
+          <DonutChart 
+            title="Pengeluaran bulan ini" 
+            income={totals.income} 
+            expense={totals.expense} 
+          />
         )}
       </section>
 
@@ -970,23 +968,6 @@ function HistoryScreen({
         </select>
       </div>
 
-      <section className="history-summary">
-        {isLoading ? (
-          <div style={{ display: 'contents' }}>
-            <div style={{ gridColumn: '1 / span 2' }}><SummaryCardSkeleton /></div>
-            <ChartSkeleton />
-          </div>
-        ) : (
-          <>
-            <div>
-              <p>Total Pengeluaran</p>
-              <strong>{rupiah.format(filteredTotals.expense)}</strong>
-            </div>
-            <DonutChart income={filteredTotals.income} expense={filteredTotals.expense} />
-          </>
-        )}
-      </section>
-
       <section className="history-metrics">
         {isLoading ? (
           <>
@@ -1000,6 +981,18 @@ function HistoryScreen({
             <MetricCard label="Total Pengeluaran" value={rupiah.format(filteredTotals.expense)} />
             <MetricCard label="Sisa Saldo" value={rupiah.format(filteredTotals.balance)} />
           </>
+        )}
+      </section>
+
+      <section className="summary-card chart-card">
+        {isLoading ? (
+          <ChartSkeleton />
+        ) : (
+          <DonutChart 
+            title="Statistik Transaksi Terfilter" 
+            income={filteredTotals.income} 
+            expense={filteredTotals.expense} 
+          />
         )}
       </section>
 
@@ -1714,7 +1707,7 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
   );
 }
 
-function DonutChart({ income, expense }: { income: number; expense: number }) {
+function DonutChart({ income, expense, title }: { income: number; expense: number; title: string }) {
   const total = income + expense;
   const incomePct = total === 0 ? 0 : Math.round((income / total) * 100);
   const expensePct = total === 0 ? 0 : 100 - incomePct;
@@ -1724,54 +1717,68 @@ function DonutChart({ income, expense }: { income: number; expense: number }) {
   const expenseValue = total === 0 ? 0 : expensePct;
 
   const breakdown = [
-    { label: "Pemasukan", value: incomePct, color: "var(--green)" },
-    { label: "Pengeluaran", value: expensePct, color: "var(--rose)" },
+    { label: "Pemasukan", value: incomePct, amount: income, color: "var(--green)" },
+    { label: "Pengeluaran", value: expensePct, amount: expense, color: "var(--rose)" },
   ];
 
   return (
-    <>
-      <div className="donut-chart" aria-label="Grafik pengeluaran">
-        <svg viewBox="0 0 36 36" className="donut-svg">
-          {/* Background circle */}
-          <circle 
-            cx="18" cy="18" r="15.9155" 
-            fill="none" 
-            stroke="var(--border)" 
-            strokeWidth="4" 
-          />
-          {/* Income segment */}
-          <circle 
-            cx="18" cy="18" r="15.9155" 
-            fill="none" 
-            stroke="var(--green)" 
-            strokeWidth="4" 
-            strokeDasharray={`${incomeValue} ${100 - incomeValue}`}
-            strokeDashoffset="25"
-            style={{ transition: "stroke-dasharray 0.3s ease" }}
-          />
-          {/* Expense segment */}
-          <circle 
-            cx="18" cy="18" r="15.9155" 
-            fill="none" 
-            stroke="var(--rose)" 
-            strokeWidth="4" 
-            strokeDasharray={`${expenseValue} ${100 - expenseValue}`}
-            strokeDashoffset={25 - incomeValue}
-            style={{ transition: "stroke-dasharray 0.3s ease" }}
-          />
-        </svg>
+    <div className="donut-content-full">
+      <div className="chart-header">
+        <p>Graphic statistic</p>
+        <h2>{title}</h2>
       </div>
-      <div className="legend-list">
+      <div className="stats-container">
+        <div className="donut-wrapper">
+          <div className="donut-chart" aria-label="Grafik pengeluaran">
+          <svg viewBox="0 0 36 36" className="donut-svg">
+            <circle 
+              cx="18" cy="18" r="15.9155" 
+              fill="none" 
+              stroke="var(--border)" 
+              strokeWidth="4" 
+              opacity="0.3"
+            />
+            <circle 
+              cx="18" cy="18" r="15.9155" 
+              fill="none" 
+              stroke="var(--green)" 
+              strokeWidth="4" 
+              strokeDasharray={`${incomeValue} ${100 - incomeValue}`}
+              strokeDashoffset="25"
+              strokeLinecap="round"
+              style={{ transition: "stroke-dasharray 0.5s ease" }}
+            />
+            <circle 
+              cx="18" cy="18" r="15.9155" 
+              fill="none" 
+              stroke="var(--rose)" 
+              strokeWidth="4" 
+              strokeDasharray={`${expenseValue} ${100 - expenseValue}`}
+              strokeDashoffset={25 - incomeValue}
+              strokeLinecap="round"
+              style={{ transition: "stroke-dasharray 0.5s ease" }}
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div className="legend-list-premium">
         {breakdown.map((item) => (
-          <span key={item.label}>
-            <i style={{ background: item.color }} />
-            {item.label}
-            <b>{item.value}%</b>
-          </span>
+          <div key={item.label} className="legend-item-premium">
+            <div className="legend-label-group">
+              <i style={{ background: item.color }} />
+              <div className="legend-text-info">
+                <span>{item.label}</span>
+                <p>{rupiah.format(item.amount)}</p>
+              </div>
+            </div>
+            <div className="legend-percentage">{item.value}%</div>
+          </div>
         ))}
       </div>
-    </>
-  );
+    </div>
+  </div>
+);
 }
 
 
