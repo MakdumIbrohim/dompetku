@@ -1500,7 +1500,14 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
 
   // 1. Ambil 7 hari terakhir
   const last7Days = useMemo(() => {
-    const days = [];
+    interface TrendDay {
+      date: string;
+      label: string;
+      fullLabel: string;
+      income: number;
+      expense: number;
+    }
+    const days: TrendDay[] = [];
     const dayLabels = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
