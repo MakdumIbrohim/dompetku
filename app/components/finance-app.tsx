@@ -577,7 +577,7 @@ function DashboardScreen({
           <div className="skeleton-box" style={{ width: '100%', height: '180px' }}></div>
         ) : (
           <>
-            <h2>Tren Pengeluaran 7 Hari Terakhir</h2>
+            <h2>Pemasukan Dan Pengeluaran 7 Hari Terakhir</h2>
             <TrendChart transactions={transactions} />
           </>
         )}
