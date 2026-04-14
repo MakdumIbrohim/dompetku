@@ -896,12 +896,18 @@ function HistoryScreen({
           onClose={() => setIsExportModalOpen(false)} 
           onExport={() => {
             setIsExportModalOpen(false);
-            // Memberikan sedikit waktu bagi browser (terutama mobile) 
-            // untuk menyelesaikan render setelah modal ditutup
             setTimeout(() => {
               window.print();
             }, 500);
           }} 
+          onCSV={() => {
+            setIsExportModalOpen(false);
+            exportToCSV(filteredTransactions);
+          }}
+          onExcel={() => {
+            setIsExportModalOpen(false);
+            exportToExcel(filteredTransactions);
+          }}
         />
       ) : selectedItem ? (
         <TransactionDetailModal 
@@ -913,7 +919,7 @@ function HistoryScreen({
         <p>Filter Periode Waktu</p>
         <button className="export-btn no-print" onClick={() => setIsExportModalOpen(true)}>
           <DownloadIcon />
-          Export PDF
+          Ekspor Data
         </button>
       </div>
       <div className="history-filters" style={{ flexWrap: 'wrap' }}>
@@ -1313,6 +1319,18 @@ function KelolaRow({ item, onDelete, onEdit }: { item: Transaction; onDelete: (i
         </div>
       </td>
     </tr>
+  );
+}
+
+function SummaryIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
+    </svg>
   );
 }
 
@@ -1802,44 +1820,128 @@ function screenLabel(screen: Screen) {
 }
 
 
-function ExportModal({ onClose, onExport }: { onClose: () => void, onExport: () => void }) {
+function ExportModal({ onClose, onExport, onCSV, onExcel }: { 
+  onClose: () => void, 
+  onExport: () => void,
+  onCSV: () => void,
+  onExcel: () => void
+}) {
   return (
     <div className="modal-backdrop no-print">
-      <div className="modal-content" style={{ maxWidth: '500px' }}>
+      <div className="modal-content" style={{ maxWidth: '480px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ margin: 0 }}>Ekspor ke PDF</h2>
+          <h2 style={{ margin: 0, fontSize: '20px' }}>Ekspor Dokumen</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', color: 'var(--muted)' }}>✕</button>
         </div>
         
         <div className="modal-body">
-          <div className="info-card-premium">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            <div>
-              <strong>Informasi Penting</strong>
-              <p style={{ margin: '4px 0 0', fontSize: '13px', opacity: 0.9 }}>
-                Dokumen PDF yang dihasilkan akan mengikuti data yang tampil saat ini (berdasarkan filter tahun, bulan, dan tanggal yang Anda pilih).
-              </p>
-            </div>
+          <p style={{ color: 'var(--muted)', marginBottom: '20px', fontSize: '14px' }}>
+            Pilih format dokumen yang ingin Anda unduh untuk histori transaksi saat ini.
+          </p>
+          
+          <div className="export-options-grid">
+            <button className="export-option-card" onClick={onExport}>
+              <div className="export-icon pdf"><DownloadIcon /></div>
+              <div className="export-info">
+                <strong>Dokumen PDF</strong>
+                <span>Laporan resmi & rapi</span>
+              </div>
+            </button>
+
+            <button className="export-option-card" onClick={onCSV}>
+              <div className="export-icon csv"><CalendarIcon /></div>
+              <div className="export-info">
+                <strong>Data CSV</strong>
+                <span>Untuk Google Sheets</span>
+              </div>
+            </button>
+
+            <button className="export-option-card" onClick={onExcel}>
+              <div className="export-icon excel"><SummaryIcon /></div>
+              <div className="export-info">
+                <strong>Data Excel</strong>
+                <span>Format .xls (Spreadsheet)</span>
+              </div>
+            </button>
           </div>
-          <p>Pastikan Anda telah mengatur filter periode waktu dengan benar sebelum mencetak dokumen ini.</p>
         </div>
 
-        <div className="modal-actions" style={{ borderTop: '1px solid var(--border)', paddingTop: '20px' }}>
-          <button type="button" className="btn-cancel" onClick={onClose}>Batal</button>
-          <button type="button" className="btn-confirm" onClick={onExport} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px' }}>
-            <div style={{ width: '18px', height: '18px', display: 'flex', alignItems: 'center' }}>
-              <DownloadIcon />
-            </div>
-            Cetak PDF Sekarang
-          </button>
+        <div className="modal-actions" style={{ marginTop: '20px' }}>
+          <button type="button" className="btn-cancel" style={{ width: '100%' }} onClick={onClose}>Tutup</button>
         </div>
       </div>
     </div>
   );
+}
+
+// Helper: Export to CSV
+function triggerDownload(content: string, filename: string, type: string) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function exportToCSV(data: Transaction[]) {
+  const headers = ["Tanggal", "Keterangan", "Kategori", "Atas Nama", "Metode", "Tipe", "Nominal"];
+  const rows = data.map(t => [
+    t.date,
+    `"${t.title.replace(/"/g, '""')}"`,
+    t.category,
+    `"${(t.atas_nama || "-").replace(/"/g, '""')}"`,
+    t.metode_pembayaran,
+    t.type,
+    t.amount
+  ]);
+  
+  const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+  triggerDownload(csvContent, `Dompetku-History-${new Date().toISOString().split('T')[0]}.csv`, "text/csv;charset=utf-8;");
+}
+
+function exportToExcel(data: Transaction[]) {
+  // Simple HTML table trick for Excel (natively supported as spreadsheet)
+  const rows = data.map(t => `
+    <tr>
+      <td>${t.date}</td>
+      <td>${t.title}</td>
+      <td>${t.category}</td>
+      <td>${t.atas_nama || "-"}</td>
+      <td>${t.metode_pembayaran}</td>
+      <td>${t.type}</td>
+      <td>${t.amount}</td>
+    </tr>
+  `).join("");
+
+  const table = `
+    <table border="1">
+      <thead>
+        <tr style="background-color: #f2f2f2;">
+          <th>Tanggal</th>
+          <th>Keterangan</th>
+          <th>Kategori</th>
+          <th>Atas Nama</th>
+          <th>Metode</th>
+          <th>Tipe</th>
+          <th>Nominal</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+
+  const excelContent = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Histori Transaksi</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head>
+      <body>${table}</body>
+    </html>
+  `;
+
+  triggerDownload(excelContent, `Dompetku-History-${new Date().toISOString().split('T')[0]}.xls`, "application/vnd.ms-excel");
 }
 
 function PrintReportHeader({ title, period }: { title: string; period: string }) {

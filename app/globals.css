@@ -577,13 +577,60 @@ a, button { -webkit-tap-highlight-color: transparent; }
   font-variant-numeric: tabular-nums;
 }
 
-/* ─── Donut / chart card ────────────────────────────── */
-.chart-card {
+/* ─── Export Modal Styles ────────────────────────── */
+.export-options-grid {
   display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 16px;
+  gap: 12px;
+}
+
+.export-option-card {
+  display: flex;
   align-items: center;
-  padding: 24px;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.export-option-card:hover {
+  border-color: var(--slate-mid);
+  transform: translateY(-2px);
+  background: var(--bg-card);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.export-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.export-icon.pdf { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
+.export-icon.csv { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.export-icon.excel { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+
+.export-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.export-info strong {
+  display: block;
+  font-size: 15px;
+  color: var(--fg);
+}
+
+.export-info span {
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .chart-card h2 {
