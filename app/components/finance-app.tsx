@@ -1558,15 +1558,16 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
     1
   );
   
-  const chartHeight = 160;
+  const chartHeight = 280; // Increased from 160 for better mobile impact
   const chartWidth = 1000;
   const paddingX = 80;
   
   // 3. Kalkulasi koordinat titik
   const points = last7Days.map((d, i) => {
     const x = paddingX + (i / (last7Days.length - 1)) * (chartWidth - paddingX * 2);
-    const incomeY = chartHeight - (d.income / maxAmount) * (chartHeight - 30);
-    const expenseY = chartHeight - (d.expense / maxAmount) * (chartHeight - 30);
+    // Increased the data drawing area (chartHeight - 40)
+    const incomeY = chartHeight - (d.income / maxAmount) * (chartHeight - 40);
+    const expenseY = chartHeight - (d.expense / maxAmount) * (chartHeight - 40);
     return { x, incomeY, expenseY };
   });
 
@@ -1634,8 +1635,8 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
         {[0, 0.5, 1].map(v => (
           <line 
             key={v}
-            x1={paddingX} y1={chartHeight - v * (chartHeight - 30)} 
-            x2={chartWidth - paddingX} y2={chartHeight - v * (chartHeight - 30)}
+            x1={paddingX} y1={chartHeight - v * (chartHeight - 40)} 
+            x2={chartWidth - paddingX} y2={chartHeight - v * (chartHeight - 40)}
             stroke="var(--border)"
             strokeWidth="1"
             strokeDasharray="4 6"
