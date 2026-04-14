@@ -350,7 +350,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
   height: 42px;
   padding: 0 20px;
   border-radius: 12px;
-  background: var(--slate-deep);
+  background: var(--green) !important;
   color: #fff;
   border: none;
   font-size: 14px;
@@ -2015,7 +2015,7 @@ select:focus {
   line-height: 0.9;
   font-weight: 950;
   letter-spacing: -0.04em;
-  color: var(--slate-deep);
+  color: var(--green) !important;
 }
 
 .login-copy span {
