@@ -17,7 +17,7 @@
   --rose-light:    #ffeef2;
   --rose-shadow:   rgb(214 0 66 / 14%);
 
-  /* Balance card — deep indigo */
+  /* Balance card — now uses dynamic accent color as base */
   --slate-deep:    #2F338B;
   --slate-mid:     #5156D6;
 
@@ -464,13 +464,15 @@ a, button { -webkit-tap-highlight-color: transparent; }
   align-content: space-between;
   min-height: 236px;
   padding: 26px;
-  background: linear-gradient(135deg, var(--slate-deep) 0%, var(--slate-mid) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green), #000 25%) 0%, var(--green) 100%);
   color: #fff;
   border-radius: var(--radius-card);
+  box-shadow: 0 12px 40px var(--green-shadow);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .is-dark .balance-card {
-  background: linear-gradient(135deg, #24276b 0%, #3a3f9e 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green), #000 40%) 0%, color-mix(in srgb, var(--green), #000 10%) 100%);
 }
 
 .balance-card p {
