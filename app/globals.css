@@ -505,12 +505,76 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .trend-content {
   width: 100%;
   margin-top: 10px;
+  position: relative; /* Anchor for tooltip */
 }
 
 .trend-svg {
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* ─── Trend Tooltip ─────────────────────────────────── */
+.trend-tooltip {
+  position: absolute;
+  z-index: 100;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px;
+  color: var(--fg);
+  pointer-events: none;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.15);
+  transform: translate(-50%, -100%);
+  margin-top: -20px;
+  transition: opacity 0.2s, transform 0.2s ease-out;
+  min-width: 160px;
+}
+
+.is-dark .trend-tooltip {
+  background: rgba(30, 41, 59, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.trend-tooltip strong {
+  display: block;
+  font-size: 13px;
+  color: var(--fg);
+  margin-bottom: 8px;
+  font-weight: 800;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.trend-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.trend-tooltip-label {
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.trend-tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px; /* Slightly squared dots for premium feel */
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.trend-tooltip-value {
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ─── Donut / chart card ────────────────────────────── */

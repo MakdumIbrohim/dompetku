@@ -1496,6 +1496,8 @@ function TransactionDetailModal({
 }
 
 function TrendChart({ transactions }: { transactions: Transaction[] }) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   // 1. Ambil 7 hari terakhir
   const last7Days = useMemo(() => {
     const days = [];
@@ -1507,6 +1509,7 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
       days.push({
         date: dateStr,
         label: dayLabels[d.getDay()],
+        fullLabel: d.toLocaleDateString("id-ID", { weekday: 'long', day: 'numeric', month: 'short' }),
         income: 0,
         expense: 0
       });
@@ -1553,6 +1556,37 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
 
   return (
     <div className="trend-content" style={{ width: '100%', marginTop: '16px' }}>
+      {/* Tooltip (Mini-Card Style) */}
+      {hoveredIndex !== null && (
+        <div 
+          className="trend-tooltip" 
+          style={{ 
+            left: `${(points[hoveredIndex].x / chartWidth) * 100}%`,
+            top: `${(Math.min(points[hoveredIndex].incomeY, points[hoveredIndex].expenseY) / (chartHeight + 80)) * 100}%`
+          }}
+        >
+          <strong>{last7Days[hoveredIndex].fullLabel}</strong>
+          <div className="trend-tooltip-row">
+            <span className="trend-tooltip-label">
+              <i className="trend-tooltip-dot" style={{ background: 'var(--green)' }} />
+              Masuk
+            </span>
+            <span className="trend-tooltip-value" style={{ color: 'var(--green)' }}>
+              {rupiah.format(last7Days[hoveredIndex].income)}
+            </span>
+          </div>
+          <div className="trend-tooltip-row">
+            <span className="trend-tooltip-label">
+              <i className="trend-tooltip-dot" style={{ background: 'var(--rose)' }} />
+              Keluar
+            </span>
+            <span className="trend-tooltip-value" style={{ color: 'var(--rose)' }}>
+              {rupiah.format(last7Days[hoveredIndex].expense)}
+            </span>
+          </div>
+        </div>
+      )}
+
       <svg 
         viewBox={`0 0 ${chartWidth} ${chartHeight + 80}`} 
         className="trend-svg" 
@@ -1583,6 +1617,15 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
           />
         ))}
 
+        {/* Tracker Line */}
+        {hoveredIndex !== null && (
+          <line 
+            x1={points[hoveredIndex].x} y1="0" 
+            x2={points[hoveredIndex].x} y2={chartHeight} 
+            stroke="var(--slate-mid)" strokeWidth="1" strokeDasharray="4 4" opacity="0.4"
+          />
+        )}
+
         {/* Areas */}
         <path d={incomeArea} fill="url(#incomeGradient)" />
         <path d={expenseArea} fill="url(#expenseGradient)" />
@@ -1595,14 +1638,41 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
         {points.map((p, i) => (
           <g key={i}>
             {/* Markers */}
-            <circle cx={p.x} cy={p.incomeY} r="4" fill="var(--bg-card)" stroke="var(--green)" strokeWidth="2.5" />
-            <circle cx={p.x} cy={p.expenseY} r="4" fill="var(--bg-card)" stroke="var(--rose)" strokeWidth="2.5" />
+            <circle 
+              cx={p.x} cy={p.incomeY} r={hoveredIndex === i ? 6 : 4} 
+              fill={hoveredIndex === i ? "var(--green)" : "var(--bg-card)"} 
+              stroke="var(--green)" strokeWidth="2.5" 
+              style={{ transition: 'all 0.2s' }}
+            />
+            <circle 
+              cx={p.x} cy={p.expenseY} r={hoveredIndex === i ? 6 : 4} 
+              fill={hoveredIndex === i ? "var(--rose)" : "var(--bg-card)"} 
+              stroke="var(--rose)" strokeWidth="2.5" 
+              style={{ transition: 'all 0.2s' }}
+            />
             
             {/* Day Labels */}
-            <text x={p.x} y={chartHeight + 35} textAnchor="middle" fontSize="14" fill="var(--muted)" fontWeight="700">
+            <text 
+              x={p.x} y={chartHeight + 35} textAnchor="middle" fontSize="14" 
+              fill={hoveredIndex === i ? "var(--fg)" : "var(--muted)"} 
+              fontWeight={hoveredIndex === i ? "800" : "700"}
+              style={{ transition: 'all 0.2s' }}
+            >
               {last7Days[i].label}
             </text>
           </g>
+        ))}
+
+        {/* Interaction Areas (Hit boxes) */}
+        {points.map((p, i) => (
+          <rect 
+            key={`hit-${i}`}
+            x={p.x - 40} y="0" width="80" height={chartHeight + 50}
+            fill="transparent"
+            style={{ cursor: 'pointer' }}
+            onMouseEnter={() => setHoveredIndex(i)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          />
         ))}
 
         {/* Legend */}
