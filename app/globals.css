@@ -487,6 +487,32 @@ a, button { -webkit-tap-highlight-color: transparent; }
   font-weight: 700;
 }
 
+/* ─── Trend chart card ─────────────────────────────── */
+.trend-card {
+  grid-column: 1 / -1;
+  padding: 20px;
+}
+
+.trend-card h2 {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.trend-content {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.trend-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* ─── Donut / chart card ────────────────────────────── */
 .chart-card {
   display: grid;
@@ -741,10 +767,13 @@ select:focus {
   font-weight: 800;
 }
 
+
+
 /* ─── Recent transactions card ──────────────────────── */
 .recent-card {
   grid-column: 1 / -1;
   padding: 24px;
+  margin-top: 14px;
 }
 
 .section-title {

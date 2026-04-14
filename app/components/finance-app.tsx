@@ -420,6 +420,7 @@ function WalletIcon() {
   );
 }
 
+
 function Sidebar({
   screen,
   onNavigate,
@@ -571,6 +572,17 @@ function DashboardScreen({
 
   return (
     <div className="dashboard-grid">
+      <section className="summary-card trend-card">
+        {isLoading ? (
+          <div className="skeleton-box" style={{ width: '100%', height: '180px' }}></div>
+        ) : (
+          <>
+            <h2>Tren Pengeluaran 7 Hari Terakhir</h2>
+            <TrendChart transactions={transactions} />
+          </>
+        )}
+      </section>
+
       <section className="summary-card balance-card">
         {isLoading ? (
           <SummaryCardSkeleton />
@@ -718,7 +730,7 @@ function DashboardScreen({
           Simpan transaksi
         </button>
       </form>
-
+      
       <section className="recent-card">
         <div className="section-title">
           <p>Aktivitas terbaru</p>
@@ -1483,6 +1495,114 @@ function TransactionDetailModal({
   );
 }
 
+function TrendChart({ transactions }: { transactions: Transaction[] }) {
+  // 1. Ambil 7 hari terakhir
+  const last7Days = useMemo(() => {
+    const days = [];
+    const dayLabels = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split("T")[0];
+      days.push({
+        date: dateStr,
+        label: dayLabels[d.getDay()],
+        amount: 0
+      });
+    }
+    
+    // 2. Isi data pengeluaran
+    transactions.forEach(t => {
+      if (t.type === "Pengeluaran") {
+        const day = days.find(d => d.date === t.date);
+        if (day) day.amount += t.amount;
+      }
+    });
+    
+    return days;
+  }, [transactions]);
+
+  const maxAmount = Math.max(...last7Days.map(d => d.amount), 1);
+  const chartHeight = 160;
+  const chartWidth = 1000;
+  const paddingX = 80;
+  
+  // 3. Kalkulasi koordinat titik (dengan padding agar pas dengan teks)
+  const points = last7Days.map((d, i) => {
+    const x = paddingX + (i / (last7Days.length - 1)) * (chartWidth - paddingX * 2);
+    const y = chartHeight - (d.amount / maxAmount) * (chartHeight - 30);
+    return { x, y };
+  });
+
+  // Buat path string
+  const pathD = points.length > 0 ? points.reduce((acc, p, i) => 
+    i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, 
+  "") : "";
+  
+  const areaD = points.length > 0 ? `${pathD} L ${points[points.length-1].x} ${chartHeight} L ${points[0].x} ${chartHeight} Z` : "";
+
+  return (
+    <div className="trend-content" style={{ width: '100%', marginTop: '16px' }}>
+      <svg 
+        viewBox={`0 0 ${chartWidth} ${chartHeight + 50}`} 
+        className="trend-svg" 
+        width="100%" 
+        height="auto"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <defs>
+          <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--slate-mid)" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="var(--slate-mid)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        
+        {/* Grid lines */}
+        {[0, 0.5, 1].map(v => (
+          <line 
+            key={v}
+            x1={paddingX} y1={chartHeight - v * (chartHeight - 30)} 
+            x2={chartWidth - paddingX} y2={chartHeight - v * (chartHeight - 30)}
+            stroke="var(--border)"
+            strokeWidth="1"
+            strokeDasharray="4 6"
+          />
+        ))}
+
+        {/* Area fill */}
+        <path d={areaD} fill="url(#trendGradient)" />
+        
+        {/* Line */}
+        <path 
+          d={pathD} 
+          fill="none" 
+          stroke="var(--slate-mid)" 
+          strokeWidth="3" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+        />
+
+        {/* Dots & Labels */}
+        {points.map((p, i) => (
+          <g key={i}>
+            <circle cx={p.x} cy={p.y} r="5" fill="var(--bg-card)" stroke="var(--slate-mid)" strokeWidth="2.5" />
+            <text 
+              x={p.x} 
+              y={chartHeight + 35} 
+              textAnchor="middle" 
+              fontSize="14" 
+              fill="var(--muted)" 
+              fontWeight="700"
+            >
+              {last7Days[i].label}
+            </text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
 function DonutChart({ income, expense }: { income: number; expense: number }) {
   const total = income + expense;
   const incomePct = total === 0 ? 0 : Math.round((income / total) * 100);
@@ -1582,11 +1702,13 @@ function getMonthName(monthStr: string) {
   return new Intl.DateTimeFormat("id-ID", { month: "long" }).format(date);
 }
 
+
 function screenLabel(screen: Screen) {
   if (screen === "histori") return "Histori";
   if (screen === "kelola") return "Kelola Data";
   return "Dashboard";
 }
+
 
 function ExportModal({ onClose, onExport }: { onClose: () => void, onExport: () => void }) {
   return (
