@@ -1588,6 +1588,7 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
         <path d={expenseArea} fill="url(#expenseGradient)" />
         
         {/* Lines */}
+        <path d={incomePath} fill="none" stroke="var(--green)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         <path d={expensePath} fill="none" stroke="var(--rose)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
         {/* Labels & Markers */}
