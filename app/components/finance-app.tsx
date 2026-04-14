@@ -8,7 +8,7 @@ import { useTheme } from "../context/ThemeContext";
 import { useData, Transaction, defaultIncomeCategories, defaultExpenseCategories } from "../context/DataContext";
 import { useAuth } from "../context/AuthContext";
 
-type Screen = "login" | "dashboard" | "histori" | "kelola";
+type Screen = "login" | "dashboard" | "histori" | "kelola" | "tema";
 type TransactionType = "Pemasukan" | "Pengeluaran";
 
 
@@ -22,7 +22,8 @@ const rupiah = new Intl.NumberFormat("id-ID", {
 const menuItems = [
   { href: "/", label: "Dashboard" },
   { href: "/histori", label: "Histori" },
-  { href: "/kelola", label: "Kelola Data" }
+  { href: "/kelola", label: "Kelola Data" },
+  { href: "/pengaturan/tema", label: "Tema" }
 ];
 
 const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL || "";
@@ -268,6 +269,8 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
                 ? `Halo, ${user?.nama_lengkap || "Pengguna"}.` 
                 : screen === "histori" 
                 ? "Histori Transaksi" 
+                : screen === "tema"
+                ? "Kustomisasi Tema"
                 : "Kelola Data"}
             </h1>
           </div>
@@ -321,6 +324,9 @@ export default function FinanceApp({ screen }: { screen: Screen }) {
             onDelete={requestDelete}
             onEdit={setEditData}
           />
+        )}
+        {screen === "tema" && (
+          <ThemeSettingsScreen />
         )}
       </section>
     </main>
@@ -1315,6 +1321,159 @@ function KelolaRow({ item, onDelete, onEdit }: { item: Transaction; onDelete: (i
   );
 }
 
+function ThemeSettingsScreen() {
+  const { 
+    accentColor, 
+    setAccentColor, 
+    fontFamily, 
+    setFontFamily, 
+    borderRadius, 
+    setBorderRadius,
+    resetTheme 
+  } = useTheme();
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const presets = [
+    { name: "Indigo", color: "#5156D6" },
+    { name: "Emerald", color: "#10b981" },
+    { name: "Rose", color: "#f43f5e" },
+    { name: "Amber", color: "#f59e0b" },
+    { name: "Violet", color: "#8b5cf6" },
+    { name: "Slate", color: "#475569" },
+  ];
+
+  const fonts: ("Inter" | "Roboto" | "Poppins")[] = ["Inter", "Roboto", "Poppins"];
+  const radii: ("sharp" | "rounded" | "extra-rounded")[] = ["sharp", "rounded", "extra-rounded"];
+
+  if (!mounted) {
+    return (
+      <div className="theme-settings-grid">
+        <section className="summary-card theme-card-large">
+          <div className="skeleton-box" style={{ width: '100%', height: '400px', borderRadius: '20px' }} />
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div className="theme-settings-grid">
+      <section className="summary-card theme-card-large">
+        <div className="theme-section">
+          <div className="theme-section-header">
+            <PaletteIcon />
+            <div>
+              <h3>Warna Aksen</h3>
+              <p>Pilih warna identitas aplikasi Anda</p>
+            </div>
+          </div>
+          
+          <div className="presets-row">
+            {presets.map((p) => (
+              <button
+                key={p.name}
+                className={`preset-btn ${accentColor === p.color ? "active" : ""}`}
+                style={{ "--preset-color": p.color } as any}
+                onClick={() => setAccentColor(p.color)}
+                title={p.name}
+              />
+            ))}
+            <div className="color-picker-wrapper">
+              <input
+                type="color"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="custom-color-input"
+              />
+              <PaintIcon />
+            </div>
+          </div>
+        </div>
+
+        <div className="theme-divider" />
+
+        <div className="theme-section">
+          <div className="theme-section-header">
+            <span style={{ fontSize: "24px", fontWeight: "800" }}>Aa</span>
+            <div>
+              <h3>Tipografi</h3>
+              <p>Pilih jenis font yang paling nyaman dibaca</p>
+            </div>
+          </div>
+          
+          <div className="toggle-group">
+            {fonts.map((f) => (
+              <button
+                key={f}
+                className={`toggle-btn ${fontFamily === f ? "active" : ""}`}
+                onClick={() => setFontFamily(f)}
+                style={{ fontFamily: `var(--font-${f.toLowerCase()})` }}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="theme-divider" />
+
+        <div className="theme-section">
+          <div className="theme-section-header">
+            <div className="radius-preview" style={{ borderRadius: borderRadius === 'sharp' ? '0px' : borderRadius === 'extra-rounded' ? '12px' : '6px' }} />
+            <div>
+              <h3>Sudut Kelengkungan</h3>
+              <p>Atur seberapa bulat sudut elemen antarmuka</p>
+            </div>
+          </div>
+          
+          <div className="toggle-group">
+            {radii.map((r) => (
+              <button
+                key={r}
+                className={`toggle-btn ${borderRadius === r ? "active" : ""}`}
+                onClick={() => setBorderRadius(r)}
+              >
+                {r === 'sharp' ? 'Tajam' : r === 'rounded' ? 'Bulat' : 'Sangat Bulat'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="theme-actions">
+          <button className="reset-theme-btn" onClick={resetTheme}>
+            <RefreshIcon />
+            Atur Ulang ke Default
+          </button>
+        </div>
+      </section>
+
+      <section className="theme-preview-sidebar">
+        <div className="preview-label">Live Preview</div>
+        <div className="preview-container">
+          <div className="preview-card balance">
+            <small>Saldo Aktif</small>
+            <strong>Rp 12.500.000</strong>
+          </div>
+          <div className="preview-card">
+            <div className="preview-row">
+              <div className="preview-icon" />
+              <div className="preview-text">
+                <div className="preview-line long" />
+                <div className="preview-line short" />
+              </div>
+              <div className="preview-amount">+500rb</div>
+            </div>
+          </div>
+          <button className="preview-button">Simpan Transaksi</button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function SummaryIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1822,9 +1981,13 @@ function getMonthName(monthStr: string) {
 
 
 function screenLabel(screen: Screen) {
-  if (screen === "histori") return "Histori";
-  if (screen === "kelola") return "Kelola Data";
-  return "Dashboard";
+  switch (screen) {
+    case "dashboard": return "Dashboard";
+    case "histori": return "Histori";
+    case "kelola": return "Kelola Data";
+    case "tema": return "Tema";
+    default: return "";
+  }
 }
 
 
@@ -1976,5 +2139,38 @@ function PrintReportHeader({ title, period }: { title: string; period: string })
         <div><span>Dicetak pada:</span> {today}</div>
       </div>
     </div>
+  );
+}
+
+function PaletteIcon() {
+  return (
+    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
+      <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
+      <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
+      <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.707-.484 2.146-1.215.333-.556.847-.785 1.442-.785h1.412c2.21 0 4-1.79 4-4 0-3.356-2.644-6.082-6-6h-3c-1.105 0-2-.895-2-2s.895-2 2-2h3c2.21 0 4-1.79 4-4s-1.79-4-4-4z" />
+    </svg>
+  );
+}
+
+function PaintIcon() {
+  return (
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m14 6-2-2-4 4 2 2" />
+      <path d="M14 6v6h-2" />
+      <path d="M14 2c1.1 0 2 .9 2 2v2h2c1.1 0 2 .9 2 2s-.9 2-2 2h-2v10c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2V10H4c-1.1 0-2-.9-2-2s.9-2 2-2h2V4c0-1.1.9-2 2-2h4z" />
+    </svg>
+  );
+}
+
+function RefreshIcon() {
+  return (
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 2v6h-6" />
+      <path d="M3 12a9 9 0 0 1 15-6.7L21 8" />
+      <path d="M3 22v-6h6" />
+      <path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+    </svg>
   );
 }
