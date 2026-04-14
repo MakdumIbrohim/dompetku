@@ -884,7 +884,11 @@ function HistoryScreen({
           onClose={() => setIsExportModalOpen(false)} 
           onExport={() => {
             setIsExportModalOpen(false);
-            window.print();
+            // Memberikan sedikit waktu bagi browser (terutama mobile) 
+            // untuk menyelesaikan render setelah modal ditutup
+            setTimeout(() => {
+              window.print();
+            }, 500);
           }} 
         />
       ) : selectedItem ? (

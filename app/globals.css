@@ -1553,16 +1553,38 @@ select:focus {
     print-color-adjust: exact !important;
   }
 
-  body, .web-shell, .workspace, .history-layout, .history-table {
+  /* Memastikan background putih bersih dan teks hitam */
+  html, body {
+    background-color: white !important;
+    background-image: none !important;
+    color: black !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Reset layout agar tidak ada clipping/pemotongan saat print di browser mobile */
+  .web-shell, 
+  .workspace, 
+  .history-layout,
+  main {
+    display: block !important;
     background: white !important;
     color: black !important;
+    overflow: visible !important;
+    height: auto !important;
+    position: static !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
   }
 
   /* Reset Grid agar tidak ada kolom kosong saat sidebar disembunyikan */
-  .web-shell, .dashboard-grid {
+  .dashboard-grid {
     display: block !important;
   }
-  
+
+  /* Sembunyikan elemen UI yang tidak perlu dalam laporan */
   .sidebar,
   .workspace-header,
   .history-filters,
@@ -1573,16 +1595,6 @@ select:focus {
   .no-print {
     display: none !important;
   }
-
-  /* Reset workspace for document view */
-  .workspace { 
-    padding: 0 !important; 
-    margin: 0 !important; 
-    width: 100% !important; 
-    box-shadow: none !important;
-    background: white !important;
-  }
-  
   .history-layout { 
     display: block !important; 
     padding: 0 !important;
