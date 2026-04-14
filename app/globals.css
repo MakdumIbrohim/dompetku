@@ -267,7 +267,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 .section-title p,
 .login-copy p {
   margin: 0 0 6px;
-  color: var(--green);
+  color: var(--green) !important;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -388,7 +388,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
   place-items: center;
   padding: 0;
   background: #fff;
-  color: var(--slate-deep);
+  color: var(--green);
   border: 1.5px solid var(--border);
   box-shadow: 0 4px 14px var(--border);
   transition: all 180ms ease;
@@ -611,7 +611,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 }
 
 .export-option-card:hover {
-  border-color: var(--slate-mid);
+  border-color: var(--green);
   transform: translateY(-2px);
   background: var(--bg-card);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -660,7 +660,7 @@ a, button { -webkit-tap-highlight-color: transparent; }
 
 .chart-header p {
   margin: 0;
-  color: var(--slate-mid);
+  color: var(--green) !important;
   text-transform: uppercase;
   font-size: 11px;
   letter-spacing: 0.1em;
@@ -2455,7 +2455,7 @@ select:focus {
 }
 
 .preview-card.balance {
-  background: linear-gradient(135deg, var(--slate-deep) 0%, var(--green) 100%);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green), #000 25%) 0%, var(--green) 100%);
   color: #fff;
   border-radius: var(--radius-base);
 }
