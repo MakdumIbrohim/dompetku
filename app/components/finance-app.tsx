@@ -1897,7 +1897,7 @@ function DonutChart({ income, expense, title }: { income: number; expense: numbe
               strokeWidth="4" 
               opacity={total === 0 ? 0.6 : 0.2}
             />
-            {incomeValue > 0 && (
+            {incomeValue > 0 && ( 
               <circle 
                 cx="18" cy="18" r="15.9155" 
                 fill="none" 
