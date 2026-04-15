@@ -1895,28 +1895,32 @@ function DonutChart({ income, expense, title }: { income: number; expense: numbe
               fill="none" 
               stroke="var(--border)" 
               strokeWidth="4" 
-              opacity="0.3"
+              opacity={total === 0 ? 0.6 : 0.2}
             />
-            <circle 
-              cx="18" cy="18" r="15.9155" 
-              fill="none" 
-              stroke="var(--green)" 
-              strokeWidth="4" 
-              strokeDasharray={`${incomeValue} ${100 - incomeValue}`}
-              strokeDashoffset="25"
-              strokeLinecap="round"
-              style={{ transition: "stroke-dasharray 0.5s ease" }}
-            />
-            <circle 
-              cx="18" cy="18" r="15.9155" 
-              fill="none" 
-              stroke="var(--rose)" 
-              strokeWidth="4" 
-              strokeDasharray={`${expenseValue} ${100 - expenseValue}`}
-              strokeDashoffset={25 - incomeValue}
-              strokeLinecap="round"
-              style={{ transition: "stroke-dasharray 0.5s ease" }}
-            />
+            {incomeValue > 0 && (
+              <circle 
+                cx="18" cy="18" r="15.9155" 
+                fill="none" 
+                stroke="var(--green)" 
+                strokeWidth="4" 
+                strokeDasharray={`${incomeValue} ${100 - incomeValue}`}
+                strokeDashoffset="25"
+                strokeLinecap="round"
+                style={{ transition: "stroke-dasharray 0.5s ease" }}
+              />
+            )}
+            {expenseValue > 0 && (
+              <circle 
+                cx="18" cy="18" r="15.9155" 
+                fill="none" 
+                stroke="var(--rose)" 
+                strokeWidth="4" 
+                strokeDasharray={`${expenseValue} ${100 - expenseValue}`}
+                strokeDashoffset={25 - incomeValue}
+                strokeLinecap="round"
+                style={{ transition: "stroke-dasharray 0.5s ease" }}
+              />
+            )}
           </svg>
         </div>
       </div>
