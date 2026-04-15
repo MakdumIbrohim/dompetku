@@ -1682,7 +1682,7 @@ function TrendChart({ transactions }: { transactions: Transaction[] }) {
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split("T")[0];
+      const dateStr = getLocalDateString(d); // Use local date instead of UTC
       days.push({
         date: dateStr,
         label: dayLabels[d.getDay()],
@@ -1974,6 +1974,14 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
+// Helper for consistent local date string YYYY-MM-DD
+function getLocalDateString(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function getMonthName(monthStr: string) {
   const date = new Date(2000, parseInt(monthStr, 10) - 1, 1);
   return new Intl.DateTimeFormat("id-ID", { month: "long" }).format(date);
@@ -2071,7 +2079,7 @@ function exportToCSV(data: Transaction[]) {
   ]);
   
   const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
-  triggerDownload(csvContent, `Dompetku-History-${new Date().toISOString().split('T')[0]}.csv`, "text/csv;charset=utf-8;");
+  triggerDownload(csvContent, `Dompetku-History-${getLocalDateString(new Date())}.csv`, "text/csv;charset=utf-8;");
 }
 
 function exportToExcel(data: Transaction[]) {
@@ -2112,7 +2120,7 @@ function exportToExcel(data: Transaction[]) {
     </html>
   `;
 
-  triggerDownload(excelContent, `Dompetku-History-${new Date().toISOString().split('T')[0]}.xls`, "application/vnd.ms-excel");
+  triggerDownload(excelContent, `Dompetku-History-${getLocalDateString(new Date())}.xls`, "application/vnd.ms-excel");
 }
 
 function PrintReportHeader({ title, period }: { title: string; period: string }) {
